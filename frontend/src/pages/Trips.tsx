@@ -456,36 +456,41 @@ export const Trips: React.FC = () => {
             </div>
           </div>
         </div>
-
-        <div className="relative h-[500px] rounded-xl overflow-hidden bg-slate-900/50 border border-slate-800">
+        <div className="relative h-[500px] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shadow-inner">
+          {/* Map Background Image */}
+          <img 
+            src="/cyber_map.png" 
+            alt="Cyber Map" 
+            className="absolute inset-0 w-full h-full object-cover opacity-25" 
+          />
           {/* Map Background Grid */}
-          <div className="absolute inset-0 opacity-20" style={{
+          <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{
             backgroundImage: `
-              linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+              linear-gradient(rgba(59, 130, 246, 0.2) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(59, 130, 246, 0.2) 1px, transparent 1px)
             `,
-            backgroundSize: '40px 40px'
+            backgroundSize: '30px 30px'
           }}></div>
 
           {/* Zoom Controls */}
           <div className="absolute top-4 right-4 z-20 flex flex-col space-y-2">
             <button
               onClick={handleZoomIn}
-              className="w-8 h-8 rounded-lg bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center"
+              className="w-8 h-8 rounded-lg bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-md"
               title="Zoom In"
             >
               <span className="text-lg font-bold">+</span>
             </button>
             <button
               onClick={handleZoomOut}
-              className="w-8 h-8 rounded-lg bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center"
+              className="w-8 h-8 rounded-lg bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-md"
               title="Zoom Out"
             >
               <span className="text-lg font-bold">−</span>
             </button>
             <button
               onClick={handleResetView}
-              className="w-8 h-8 rounded-lg bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center"
+              className="w-8 h-8 rounded-lg bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center cursor-pointer shadow-md"
               title="Reset View"
             >
               <span className="text-xs font-bold">⟲</span>
@@ -493,8 +498,8 @@ export const Trips: React.FC = () => {
           </div>
 
           {/* Zoom Level Indicator */}
-          <div className="absolute top-4 left-4 z-20 bg-slate-800/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-slate-700">
-            <span className="text-[10px] text-slate-400">Zoom: {Math.round(mapZoom * 100)}%</span>
+          <div className="absolute top-4 left-4 z-20 bg-slate-800/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-slate-700 shadow-md">
+            <span className="text-[10px] text-slate-400 font-semibold">Zoom: {Math.round(mapZoom * 100)}%</span>
           </div>
 
           {/* Map Container with Pan and Zoom */}
@@ -515,43 +520,64 @@ export const Trips: React.FC = () => {
               }}
             >
               {/* Route Lines */}
-              <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 500" style={{ zIndex: 1 }}>
                 {filteredTrips.slice(0, 12).map((trip, index) => {
-                  const startX = 10 + (index % 4) * 20;
-                  const startY = 15 + Math.floor(index / 4) * 25;
-                  const endX = startX + 35 + (index % 3) * 10;
-                  const endY = startY + (index % 2 === 0 ? 25 : -15);
+                  const startXVal = 100 + (index % 4) * 200;
+                  const startYVal = 75 + Math.floor(index / 4) * 125;
+                  const endXVal = startXVal + 350 + (index % 3) * 100;
+                  const endYVal = startYVal + (index % 2 === 0 ? 125 : -75);
+                  
+                  const controlX = (startXVal + endXVal) / 2 + (index % 2 === 0 ? 30 : -30);
+                  const controlY = (startYVal + endYVal) / 2 + (index % 2 === 0 ? -60 : 60);
+                  const pathData = `M ${startXVal} ${startYVal} Q ${controlX} ${controlY} ${endXVal} ${endYVal}`;
                   
                   const color = trip.status === 'DISPATCHED' ? '#f97316' :
                                trip.status === 'COMPLETED' ? '#10b981' : '#64748b';
                   
                   return (
                     <g key={trip.id}>
-                      <line
-                        x1={`${startX}%`}
-                        y1={`${startY}%`}
-                        x2={`${endX}%`}
-                        y2={`${endY}%`}
+                      {/* Curved glowing path */}
+                      <path
+                        d={pathData}
+                        fill="none"
                         stroke={color}
-                        strokeWidth="2"
-                        strokeDasharray={trip.status === 'DRAFT' ? '5,5' : '0'}
-                        className={trip.status === 'DISPATCHED' ? 'animate-pulse' : ''}
-                        style={{ opacity: 0.6 }}
+                        strokeWidth={trip.status === 'DISPATCHED' ? '3' : '2'}
+                        strokeDasharray={trip.status === 'DRAFT' ? '6,6' : '0'}
+                        className={trip.status === 'DISPATCHED' ? 'transition-all duration-300' : ''}
+                        style={{ 
+                          opacity: trip.status === 'DISPATCHED' ? 0.9 : 0.45,
+                          filter: trip.status === 'DISPATCHED' ? `drop-shadow(0 0 4px ${color})` : 'none'
+                        }}
                       />
+                      
+                      {/* Start point dot */}
                       <circle
-                        cx={`${startX}%`}
-                        cy={`${startY}%`}
-                        r="4"
+                        cx={startXVal}
+                        cy={startYVal}
+                        r="3.5"
                         fill={color}
-                        className={trip.status === 'DISPATCHED' ? 'animate-pulse' : ''}
+                        style={{ opacity: 0.8 }}
                       />
+                      
+                      {/* End point dot */}
                       <circle
-                        cx={`${endX}%`}
-                        cy={`${endY}%`}
-                        r="4"
+                        cx={endXVal}
+                        cy={endYVal}
+                        r="3.5"
                         fill={color}
-                        className={trip.status === 'DISPATCHED' ? 'animate-pulse' : ''}
+                        style={{ opacity: 0.8 }}
                       />
+
+                      {/* Moving active vehicle dot */}
+                      {trip.status === 'DISPATCHED' && (
+                        <circle r="4" fill="#ffffff" className="filter drop-shadow-[0_0_6px_#f97316]">
+                          <animateMotion
+                            dur={`${7 + (index % 3) * 3}s`}
+                            repeatCount="indefinite"
+                            path={pathData}
+                          />
+                        </circle>
+                      )}
                     </g>
                   );
                 })}
@@ -560,28 +586,28 @@ export const Trips: React.FC = () => {
               {/* Location Markers */}
               <div className="absolute inset-0" style={{ zIndex: 2 }}>
                 {filteredTrips.slice(0, 12).map((trip, index) => {
-                  const startX = 10 + (index % 4) * 20;
-                  const startY = 15 + Math.floor(index / 4) * 25;
-                  const endX = startX + 35 + (index % 3) * 10;
-                  const endY = startY + (index % 2 === 0 ? 25 : -15);
-                  
-                  const color = trip.status === 'DISPATCHED' ? '#f97316' :
-                               trip.status === 'COMPLETED' ? '#10b981' : '#64748b';
+                  const startXVal = 100 + (index % 4) * 200;
+                  const startYVal = 75 + Math.floor(index / 4) * 125;
+                  const endXVal = startXVal + 350 + (index % 3) * 100;
+                  const endYVal = startYVal + (index % 2 === 0 ? 125 : -75);
                   
                   return (
                     <React.Fragment key={trip.id}>
                       {/* Origin Marker */}
                       <div
                         className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
-                        style={{ left: `${startX}%`, top: `${startY}%` }}
+                        style={{ left: `${startXVal / 10}%`, top: `${startYVal / 5}%` }}
                       >
-                        <div className="relative">
+                        <div className="relative flex items-center justify-center">
+                          {trip.status === 'DISPATCHED' && (
+                            <span className="absolute inline-flex h-6 w-6 rounded-full bg-orange-500/20 animate-ping" />
+                          )}
                           <MapPin 
-                            size={18} 
-                            className={trip.status === 'DISPATCHED' ? 'text-orange-500 animate-bounce' : 'text-slate-400'} 
+                            size={16} 
+                            className={trip.status === 'DISPATCHED' ? 'text-orange-500 animate-bounce relative z-10' : 'text-slate-400 relative z-10'} 
                           />
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-[10px] text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                            {trip.source}
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-950/90 border border-slate-800 text-[9px] font-bold text-slate-200 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none shadow-xl z-30">
+                            <span className="text-slate-500 font-medium mr-1">From:</span>{trip.source}
                           </div>
                         </div>
                       </div>
@@ -589,15 +615,18 @@ export const Trips: React.FC = () => {
                       {/* Destination Marker */}
                       <div
                         className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
-                        style={{ left: `${endX}%`, top: `${endY}%` }}
+                        style={{ left: `${endXVal / 10}%`, top: `${endYVal / 5}%` }}
                       >
-                        <div className="relative">
+                        <div className="relative flex items-center justify-center">
+                          {trip.status === 'DISPATCHED' && (
+                            <span className="absolute inline-flex h-6 w-6 rounded-full bg-orange-500/10 animate-ping" />
+                          )}
                           <MapPin 
-                            size={18} 
-                            className={trip.status === 'COMPLETED' ? 'text-emerald-500' : 'text-slate-400'} 
+                            size={16} 
+                            className={trip.status === 'COMPLETED' ? 'text-emerald-500 relative z-10' : 'text-slate-500 relative z-10'} 
                           />
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-[10px] text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                            {trip.destination}
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-950/90 border border-slate-800 text-[9px] font-bold text-slate-200 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none shadow-xl z-30">
+                            <span className="text-slate-500 font-medium mr-1">To:</span>{trip.destination}
                           </div>
                         </div>
                       </div>
@@ -605,7 +634,7 @@ export const Trips: React.FC = () => {
                   );
                 })}
               </div>
-            </div>
+            </div></div>
 
             {/* Map Legend */}
             <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-sm rounded-lg px-4 py-3 border border-slate-700 z-20">

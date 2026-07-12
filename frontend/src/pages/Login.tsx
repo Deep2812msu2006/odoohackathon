@@ -2,7 +2,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Truck, ShieldCheck, UserCheck, Landmark } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const { login, loading } = useAuth();
@@ -40,22 +39,7 @@ export const Login: React.FC = () => {
     }
   };
 
-  const handleQuickLogin = async (roleEmail: string, roleName: string) => {
-    setError('');
-    try {
-      await login(roleEmail, 'password123', roleName.toUpperCase().replace(' ', '_'));
-      navigate('/');
-    } catch (err: any) {
-      setError(err?.response?.data?.error || 'Quick login failed.');
-    }
-  };
 
-  const roleLogins = [
-    { email: 'manager@transitops.com', label: 'Fleet Manager', desc: 'Frank Manager', icon: UserCheck, color: 'border-orange-500/20 bg-orange-950/20 text-orange-400 hover:border-orange-500/50 hover:shadow-[0_0_15px_rgba(249,115,22,0.2)]' },
-    { email: 'driver@transitops.com', label: 'Driver', desc: 'Dave Driver', icon: Truck, color: 'border-emerald-500/20 bg-emerald-950/20 text-emerald-400 hover:border-emerald-500/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)]' },
-    { email: 'safety@transitops.com', label: 'Safety Officer', desc: 'Sarah Safety', icon: ShieldCheck, color: 'border-violet-500/20 bg-violet-950/20 text-violet-400 hover:border-violet-500/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]' },
-    { email: 'finance@transitops.com', label: 'Financial Analyst', desc: 'Fiona Finance', icon: Landmark, color: 'border-amber-500/20 bg-amber-950/20 text-amber-400 hover:border-amber-500/50 hover:shadow-[0_0_15px_rgba(245,158,11,0.2)]' }
-  ];
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12 sm:px-6 lg:px-8" style={{

@@ -30,6 +30,23 @@ const CustomReportTooltip = ({ active, payload, label, unit }: any) => {
 export const Reports: React.FC = () => {
   const { user } = useAuth();
   
+  const starShadows = React.useMemo(() => {
+    const generateStarShadows = (count: number) => {
+      const shadows = [];
+      for (let i = 0; i < count; i++) {
+        const x = Math.floor(Math.random() * 2000);
+        const y = Math.floor(Math.random() * 2000);
+        shadows.push(`${x}px ${y}px #ffffff`);
+      }
+      return shadows.join(', ');
+    };
+    return {
+      slow: generateStarShadows(150),
+      medium: generateStarShadows(100),
+      fast: generateStarShadows(50),
+    };
+  }, []);
+
   const [fuelEfficiency, setFuelEfficiency] = useState<any[]>([]);
   const [utilization, setUtilization] = useState<any[]>([]);
   const [roiData, setRoiData] = useState<any[]>([]);
@@ -101,38 +118,43 @@ export const Reports: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  if (!hasAccess) {
-    return (
-      <div className="flex h-[calc(100vh-8rem)] items-center justify-center p-6">
-        <div className="max-w-md text-center bg-slate-900/50 border border-slate-800 rounded-2xl p-8 shadow-xl">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-950/40 border border-amber-500/30 text-amber-400 mb-4">
-            <AlertTriangle size={32} />
-          </div>
-          <h2 className="text-xl font-bold text-slate-100">Access Restricted</h2>
-          <p className="mt-2 text-slate-400 text-sm">
-            Only the <strong className="text-slate-300">Fleet Manager</strong> or <strong className="text-slate-300">Financial Analyst</strong> possess security clearances to inspect ROI audit metrics and export logs.
-          </p>
-          <p className="text-xs text-slate-500 mt-4 leading-normal">
-            Hint: Use the "Role switcher" in the top bar to toggle role permissions instantly.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
-        <div className="text-center">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-orange-500 border-t-transparent mx-auto"></div>
-          <p className="mt-4 text-slate-400 text-sm">Compiling financial graphs and ROI logs...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
+    <div className="relative -m-6 md:-m-8 p-6 md:p-8 space-y-6 overflow-hidden rounded-2xl min-h-[calc(100vh-4rem)]" style={{
+      background: 'radial-gradient(ellipse at bottom, #1a1a2e 0%, #0f0f1a 100%)',
+    }}>
+      {/* Parallax Stars Layers */}
+      <div className="safety-stars-layer animate-stars-slow" style={{ width: '1px', height: '1px', boxShadow: starShadows.slow }} />
+      <div className="safety-stars-layer animate-stars-medium" style={{ width: '2px', height: '2px', boxShadow: starShadows.medium }} />
+      <div className="safety-stars-layer animate-stars-fast" style={{ width: '3px', height: '3px', boxShadow: starShadows.fast }} />
+
+      <div className="relative z-10 h-full">
+        {!hasAccess ? (
+          <div className="flex h-[calc(100vh-8rem)] items-center justify-center p-6">
+            <div className="max-w-md text-center bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl p-8 shadow-xl relative overflow-hidden">
+              <div className="corner-elements-3d">
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-950/40 border border-amber-500/30 text-amber-400 mb-4 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+                <AlertTriangle size={32} />
+              </div>
+              <h2 className="text-xl font-bold text-slate-100">Access Restricted</h2>
+              <p className="mt-2 text-slate-400 text-sm">
+                Only the <strong className="text-slate-300">Fleet Manager</strong> or <strong className="text-slate-300">Financial Analyst</strong> possess security clearances to inspect ROI audit metrics and export logs.
+              </p>
+              <p className="text-xs text-slate-500 mt-4 leading-normal">
+                Hint: Use the "Role switcher" in the top bar to toggle role permissions instantly.
+              </p>
+            </div>
+          </div>
+        ) : loading ? (
+          <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+            <div className="text-center">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto"></div>
+              <p className="mt-4 text-slate-400 text-sm animate-pulse">Compiling financial graphs and ROI logs...</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-100">Performance & ROI Reports</h1>
@@ -259,26 +281,30 @@ export const Reports: React.FC = () => {
           </div>
           <p className="text-[11px] text-slate-400">Gross stats based on distance traveled ($2.50/km revenue)</p>
           
-          <div className="overflow-y-auto max-h-56">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="overflow-y-auto max-h-56 pr-1">
+            <table className="w-full text-left text-xs border-separate border-spacing-y-2">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-900/30 text-slate-400 font-bold">
-                  <th className="p-3">Vehicle</th>
+                <tr className="text-slate-400 font-extrabold uppercase tracking-wider text-[9px]">
+                  <th className="p-3 pl-5">Vehicle</th>
                   <th className="p-3 text-right">Revenue</th>
                   <th className="p-3 text-right">Expenses</th>
-                  <th className="p-3 text-right text-emerald-400">Net Profit</th>
+                  <th className="p-3 pr-5 text-right text-emerald-400">Net Profit</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/40">
+              <tbody>
                 {roiData.map(v => (
-                  <tr key={v.registration} className="hover:bg-slate-900/40 transition-colors">
-                    <td className="p-3">
-                      <p className="font-semibold text-slate-200">{v.vehicleName}</p>
+                  <tr key={v.registration} className="group hover:scale-[1.005] transition-all duration-300">
+                    <td className="p-3 pl-5 bg-slate-900/25 border-t border-b first:border-l border-slate-800/80 first:rounded-l-xl group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                      <p className="font-semibold text-slate-200 group-hover:text-orange-400 transition-colors duration-200">{v.vehicleName}</p>
                       <span className="font-mono text-[9px] text-slate-500">{v.registration}</span>
                     </td>
-                    <td className="p-3 text-right font-mono text-slate-300">${v.revenue.toLocaleString()}</td>
-                    <td className="p-3 text-right font-mono text-slate-400">${v.costs.toLocaleString()}</td>
-                    <td className="p-3 text-right font-mono font-extrabold text-emerald-400 glow-text-emerald">
+                    <td className="p-3 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-right font-mono font-semibold text-slate-300">
+                      ${v.revenue.toLocaleString()}
+                    </td>
+                    <td className="p-3 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-right font-mono text-slate-400">
+                      ${v.costs.toLocaleString()}
+                    </td>
+                    <td className="p-3 pr-5 bg-slate-900/25 border-t border-b last:border-r border-slate-800/80 last:rounded-r-xl group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-right font-mono font-extrabold text-emerald-400 glow-text-emerald">
                       +${v.netProfit.toLocaleString()}
                     </td>
                   </tr>
@@ -287,6 +313,7 @@ export const Reports: React.FC = () => {
             </table>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -7,6 +7,8 @@ import { apiClient } from '../api/apiClient';
 import { useAuth } from '../context/AuthContext';
 import type { Vehicle, FuelLog, Expense } from '../api/mockDb';
 import { DollarSign, Fuel, Plus, AlertTriangle, X } from 'lucide-react';
+import { Card3D } from '../components/common/Card3D';
+
 
 const fuelSchema = z.object({
   vehicle_id: z.string().min(1, 'Vehicle is required'),
@@ -26,6 +28,24 @@ type ExpenseFormValues = z.infer<typeof expenseSchema>;
 
 export const FuelExpenses: React.FC = () => {
   const { user } = useAuth();
+
+  const starShadows = React.useMemo(() => {
+    const generateStarShadows = (count: number) => {
+      const shadows = [];
+      for (let i = 0; i < count; i++) {
+        const x = Math.floor(Math.random() * 2000);
+        const y = Math.floor(Math.random() * 2000);
+        shadows.push(`${x}px ${y}px #ffffff`);
+      }
+      return shadows.join(', ');
+    };
+    return {
+      slow: generateStarShadows(150),
+      medium: generateStarShadows(100),
+      fast: generateStarShadows(50),
+    };
+  }, []);
+
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [fuelLogs, setFuelLogs] = useState<FuelLog[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -117,6 +137,12 @@ export const FuelExpenses: React.FC = () => {
     };
   }).sort((a,b) => b.totalCost - a.totalCost);
 
+  // Compute top-level metrics
+  const totalFuelCost = fuelLogs.reduce((sum, f) => sum + f.cost, 0);
+  const totalGeneralExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const totalOperationalCost = totalFuelCost + totalGeneralExpenses;
+
+
   // Combine fuel and expenses into a single timeline ledger
   const ledgerTimeline = [
     ...fuelLogs.map(f => ({
@@ -143,22 +169,22 @@ export const FuelExpenses: React.FC = () => {
     switch (category.toLowerCase()) {
       case 'fuel':
         return {
-          pill: 'bg-blue-950/20 text-blue-400 border border-blue-500/20',
-          dot: 'bg-blue-400 pulse-dot'
+          pill: 'border-blue-500/30 bg-blue-950/35 text-blue-400 shadow-[0_0_10px_rgba(14,165,233,0.12)]',
+          dot: 'bg-blue-400 animate-pulse'
         };
       case 'maintenance':
         return {
-          pill: 'bg-amber-950/20 text-amber-400 border border-amber-500/20',
-          dot: 'bg-amber-400 pulse-dot'
+          pill: 'border-amber-500/30 bg-amber-950/35 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.12)]',
+          dot: 'bg-amber-400 animate-pulse'
         };
       case 'toll':
         return {
-          pill: 'bg-purple-950/20 text-purple-400 border border-purple-500/20',
-          dot: 'bg-purple-400 pulse-dot'
+          pill: 'border-violet-500/30 bg-violet-950/35 text-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.12)]',
+          dot: 'bg-violet-400 animate-pulse'
         };
       default:
         return {
-          pill: 'bg-slate-800/20 text-slate-400 border border-slate-700/20',
+          pill: 'border-slate-700 bg-slate-850 text-slate-400',
           dot: 'bg-slate-400'
         };
     }
@@ -167,7 +193,15 @@ export const FuelExpenses: React.FC = () => {
   const maxTotalCost = Math.max(...aggregatedStats.map(s => s.totalCost), 1);
 
   return (
-    <div className="space-y-6">
+    <div className="relative -m-6 md:-m-8 p-6 md:p-8 space-y-6 overflow-hidden rounded-2xl min-h-[calc(100vh-4rem)]" style={{
+      background: 'radial-gradient(ellipse at bottom, #1a1a2e 0%, #0f0f1a 100%)',
+    }}>
+      {/* Parallax Stars Layers */}
+      <div className="safety-stars-layer animate-stars-slow" style={{ width: '1px', height: '1px', boxShadow: starShadows.slow }} />
+      <div className="safety-stars-layer animate-stars-medium" style={{ width: '2px', height: '2px', boxShadow: starShadows.medium }} />
+      <div className="safety-stars-layer animate-stars-fast" style={{ width: '3px', height: '3px', boxShadow: starShadows.fast }} />
+
+      <div className="relative z-10 space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-100">Fleet Ledger & Expenses</h1>
@@ -193,6 +227,99 @@ export const FuelExpenses: React.FC = () => {
         )}
       </div>
 
+      {/* Top Level 3D KPI Metrics Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {/* Card 1: Total Operations Spend */}
+        <Card3D theme="rose" className="h-[130px]">
+          <div className="card-glare-3d pop-glare-3d"></div>
+          <div className="cyber-lines-3d pop-lines-3d">
+            <span></span><span></span><span></span>
+          </div>
+          <div className="scan-line-3d"></div>
+          <div className="glowing-elements-3d">
+            <div className="glow-1-3d"></div>
+            <div className="glow-2-3d"></div>
+          </div>
+          <div className="card-particles-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div className="corner-elements-3d pop-corners-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          
+          <div className="card-content-3d">
+            <div className="space-y-1.5 z-10 pop-text-3d">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total Operations Spend</p>
+              <h3 className="text-2xl font-extrabold text-rose-500 glow-text-rose">${totalOperationalCost.toLocaleString()}</h3>
+              <p className="text-[9px] text-slate-500">All fuel and general expenses</p>
+            </div>
+            <div className="rounded-2xl bg-rose-950/45 p-3.5 border border-rose-800/30 text-rose-500 z-10 pop-icon-3d">
+              <DollarSign size={20} />
+            </div>
+          </div>
+        </Card3D>
+
+        {/* Card 2: Fuel Procurement */}
+        <Card3D theme="violet" className="h-[130px]">
+          <div className="card-glare-3d pop-glare-3d"></div>
+          <div className="cyber-lines-3d pop-lines-3d">
+            <span></span><span></span><span></span>
+          </div>
+          <div className="scan-line-3d"></div>
+          <div className="glowing-elements-3d">
+            <div className="glow-1-3d"></div>
+            <div className="glow-2-3d"></div>
+          </div>
+          <div className="card-particles-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div className="corner-elements-3d pop-corners-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          
+          <div className="card-content-3d">
+            <div className="space-y-1.5 z-10 pop-text-3d">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Fuel Procurement</p>
+              <h3 className="text-2xl font-extrabold text-violet-500 glow-text-violet">${totalFuelCost.toLocaleString()}</h3>
+              <p className="text-[9px] text-slate-500">Fuel fill transaction records</p>
+            </div>
+            <div className="rounded-2xl bg-violet-950/45 p-3.5 border border-violet-800/30 text-violet-500 z-10 pop-icon-3d">
+              <Fuel size={20} />
+            </div>
+          </div>
+        </Card3D>
+
+        {/* Card 3: Vouchers & General Expenses */}
+        <Card3D theme="amber" className="h-[130px]">
+          <div className="card-glare-3d pop-glare-3d"></div>
+          <div className="cyber-lines-3d pop-lines-3d">
+            <span></span><span></span><span></span>
+          </div>
+          <div className="scan-line-3d"></div>
+          <div className="glowing-elements-3d">
+            <div className="glow-1-3d"></div>
+            <div className="glow-2-3d"></div>
+          </div>
+          <div className="card-particles-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div className="corner-elements-3d pop-corners-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          
+          <div className="card-content-3d">
+            <div className="space-y-1.5 z-10 pop-text-3d">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">General Vouchers</p>
+              <h3 className="text-2xl font-extrabold text-amber-500 glow-text-amber">${totalGeneralExpenses.toLocaleString()}</h3>
+              <p className="text-[9px] text-slate-500">Tolls, maintenance, and supplies</p>
+            </div>
+            <div className="rounded-2xl bg-amber-950/45 p-3.5 border border-amber-800/30 text-amber-500 z-10 pop-icon-3d">
+              <Plus size={20} />
+            </div>
+          </div>
+        </Card3D>
+      </div>
+
       {/* Aggregate Stats per vehicle */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="universe-card space-y-4 h-fit">
@@ -215,23 +342,47 @@ export const FuelExpenses: React.FC = () => {
                 const relativeWidthPct = (stat.totalCost / maxTotalCost) * 100;
                 
                 return (
-                  <div key={stat.id} className="rounded-xl bg-slate-900/30 p-3.5 border border-slate-800/60 space-y-3 hover:border-slate-700/65 transition-colors">
+                  <div 
+                    key={stat.id} 
+                    className="group/item hover:scale-[1.01] hover:bg-slate-900/50 hover:border-slate-700/80 transition-all duration-300 rounded-xl bg-slate-900/30 p-3.5 border border-slate-800/60 space-y-3 shadow-md"
+                  >
                     <div className="flex justify-between items-start text-xs">
                       <div>
-                        <p className="font-semibold text-slate-200">{stat.name}</p>
+                        <p className="font-semibold text-slate-200 group-hover/item:text-orange-400 transition-colors duration-200">{stat.name}</p>
                         <span className="font-mono text-[9px] text-slate-500">{stat.registration}</span>
                       </div>
-                      <span className="font-mono font-bold text-slate-300">${stat.totalCost.toLocaleString()}</span>
+                      <span className="font-mono font-extrabold text-slate-300 bg-slate-950/40 px-2 py-0.5 rounded border border-slate-800/60">${stat.totalCost.toLocaleString()}</span>
                     </div>
                     
                     <div className="space-y-1.5">
-                      <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden flex" style={{ width: `${Math.max(relativeWidthPct, 15)}%` }}>
-                        <div className="bg-blue-500 h-full" style={{ width: `${fuelPct}%` }} title={`Fuel: ${Math.round(fuelPct)}%`} />
-                        <div className="bg-amber-500 h-full" style={{ width: `${expensePct}%` }} title={`Expenses: ${Math.round(expensePct)}%`} />
+                      <div 
+                        className="h-2 w-full bg-slate-950 rounded-full overflow-hidden flex border border-slate-900 shadow-inner" 
+                        style={{ width: `${Math.max(relativeWidthPct, 25)}%` }}
+                      >
+                        {fuelPct > 0 && (
+                          <div 
+                            className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full transition-all duration-300 relative group-hover/item:brightness-110" 
+                            style={{ width: `${fuelPct}%` }} 
+                            title={`Fuel: ${Math.round(fuelPct)}%`} 
+                          />
+                        )}
+                        {expensePct > 0 && (
+                          <div 
+                            className="bg-gradient-to-r from-amber-500 to-orange-500 h-full transition-all duration-300 relative group-hover/item:brightness-110" 
+                            style={{ width: `${expensePct}%` }} 
+                            title={`Expenses: ${Math.round(expensePct)}%`} 
+                          />
+                        )}
                       </div>
-                      <div className="flex justify-between text-[9px] text-slate-500">
-                        <span>Fuel: {Math.round(fuelPct)}%</span>
-                        <span>Other: {Math.round(expensePct)}%</span>
+                      <div className="flex justify-between text-[9px] text-slate-500 font-medium">
+                        <span className="flex items-center">
+                          <span className="h-1.5 w-1.5 rounded-full bg-blue-500 mr-1 opacity-70" />
+                          Fuel: {Math.round(fuelPct)}%
+                        </span>
+                        <span className="flex items-center">
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 mr-1 opacity-70" />
+                          Other: {Math.round(expensePct)}%
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -255,41 +406,47 @@ export const FuelExpenses: React.FC = () => {
             {loading ? (
               <div className="p-8 text-center text-slate-500 text-xs">Fetching ledger details...</div>
             ) : (
-              <table className="w-full text-left text-xs border-collapse">
+              <table className="w-full text-left text-xs border-separate border-spacing-y-2.5">
                 <thead>
-                  <tr className="border-b border-slate-800 bg-slate-900/30 text-slate-400 font-bold">
-                    <th className="p-3">Date</th>
+                  <tr className="text-slate-400 font-extrabold uppercase tracking-wider text-[9px]">
+                    <th className="p-3 pl-6">Date</th>
                     <th className="p-3">Vehicle</th>
                     <th className="p-3">Activity Type</th>
                     <th className="p-3">Details / Reference</th>
-                    <th className="p-3 text-right">Cost Invoice</th>
+                    <th className="p-3 pr-6 text-right">Cost Invoice</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody>
                   {ledgerTimeline.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-slate-500 font-medium">No transactions recorded.</td>
+                      <td colSpan={5} className="p-8 text-center text-slate-500 font-semibold bg-slate-900/25 border border-slate-800/80 rounded-2xl">
+                        No transactions recorded.
+                      </td>
                     </tr>
                   ) : (
                     ledgerTimeline.map((item, idx) => {
                       const badge = getBadgeStyles(item.category);
                       return (
-                        <tr key={item.id + idx} className="hover:bg-slate-900/40 transition-colors">
-                          <td className="p-3 text-slate-400 font-mono text-[10px]">
+                        <tr key={item.id + idx} className="group hover:scale-[1.005] transition-all duration-300">
+                          <td className="p-4 pl-6 bg-slate-900/25 border-t border-b first:border-l border-slate-800/80 first:rounded-l-2xl group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-slate-400 font-mono text-[10px]">
                             {new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </td>
-                          <td className="p-3">
+                          <td className="p-4 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
                             <p className="font-semibold text-slate-200">{getVehicleName(item.vehicle_id)}</p>
                             <span className="font-mono text-[9px] text-slate-500">{getVehicleReg(item.vehicle_id)}</span>
                           </td>
-                          <td className="p-3">
-                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-bold ${badge.pill}`}>
+                          <td className="p-4 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-extrabold border ${badge.pill}`}>
                               <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${badge.dot}`} />
                               {item.type}
                             </span>
                           </td>
-                          <td className="p-3 text-slate-400 italic max-w-xs truncate" title={item.details}>{item.details}</td>
-                          <td className="p-3 text-right font-mono font-bold text-slate-200">${item.amount.toLocaleString()}</td>
+                          <td className="p-4 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-slate-300 italic max-w-xs truncate font-medium" title={item.details}>
+                            {item.details}
+                          </td>
+                          <td className="p-4 pr-6 bg-slate-900/25 border-t border-b last:border-r border-slate-800/80 last:rounded-r-2xl group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-right font-mono font-extrabold text-slate-200">
+                            ${item.amount.toLocaleString()}
+                          </td>
                         </tr>
                       );
                     })
@@ -427,6 +584,7 @@ export const FuelExpenses: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

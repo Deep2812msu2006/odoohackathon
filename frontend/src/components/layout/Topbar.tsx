@@ -38,10 +38,10 @@ export const Topbar: React.FC = () => {
           {dropdownOpen && (
             <>
               <div 
-                className="fixed inset-0 z-10" 
+                className="fixed inset-0 z-40" 
                 onClick={() => setDropdownOpen(false)}
               />
-              <div className="absolute right-0 mt-2 z-20 w-72 rounded-2xl border border-slate-800 bg-slate-900 p-2 shadow-2xl">
+              <div className="absolute right-0 mt-2 z-50 w-72 rounded-2xl border border-slate-800 bg-slate-900 p-2 shadow-2xl">
                 <div className="px-3 py-2 border-b border-slate-800">
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Demo Role Switcher</p>
                   <p className="text-[10px] text-slate-500 mt-0.5">Toggle roles to test specific page controls and rules instantly.</p>

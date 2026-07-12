@@ -25,6 +25,23 @@ export const Maintenance: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formError, setFormError] = useState('');
 
+  const starShadows = React.useMemo(() => {
+    const generateStarShadows = (count: number) => {
+      const shadows = [];
+      for (let i = 0; i < count; i++) {
+        const x = Math.floor(Math.random() * 2000);
+        const y = Math.floor(Math.random() * 2000);
+        shadows.push(`${x}px ${y}px #ffffff`);
+      }
+      return shadows.join(', ');
+    };
+    return {
+      slow: generateStarShadows(150),
+      medium: generateStarShadows(100),
+      fast: generateStarShadows(50),
+    };
+  }, []);
+
   const isFleetManager = user?.role === 'FLEET_MANAGER';
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<MaintenanceFormValues>({
@@ -106,53 +123,71 @@ export const Maintenance: React.FC = () => {
   const getVehicleReg = (id: string) => vehicles.find(v => v.id === id)?.registration_no || '';
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Workshop & Service Logs</h1>
-          <p className="text-slate-400 text-sm">Review vehicle repairs, inspections, and active shop work orders</p>
-        </div>
-        {isFleetManager && (
-          <button
-            onClick={openAddModal}
-            className="flex items-center space-x-2 px-4 py-2.5 text-xs btn-gradient"
-          >
-            <Plus size={16} />
-            <span>Open Maintenance</span>
-          </button>
-        )}
-      </div>
+    <div className="relative -m-6 md:-m-8 p-6 md:p-8 space-y-6 overflow-hidden rounded-2xl min-h-[calc(100vh-4rem)]" style={{
+      background: 'radial-gradient(ellipse at bottom, #1a1a2e 0%, #0f0f1a 100%)',
+    }}>
+      {/* Parallax Stars Layers */}
+      <div className="safety-stars-layer animate-stars-slow" style={{ width: '1px', height: '1px', boxShadow: starShadows.slow }} />
+      <div className="safety-stars-layer animate-stars-medium" style={{ width: '2px', height: '2px', boxShadow: starShadows.medium }} />
+      <div className="safety-stars-layer animate-stars-fast" style={{ width: '3px', height: '3px', boxShadow: starShadows.fast }} />
 
-      {/* Info message */}
-      <div className="glass-panel p-4 flex items-start space-x-3 text-xs">
-        <Info size={18} className="text-orange-400 mt-0.5 flex-shrink-0" />
-        <div className="text-slate-400 leading-normal">
-          <span className="font-bold text-slate-200">Lifecycle Logic Rules:</span> Opening a workshop order instantly transitions the vehicle to <span className="text-amber-400 font-semibold font-mono">IN_SHOP</span>, making it unavailable for dispatches. Closing the work order returns it to <span className="text-emerald-400 font-semibold font-mono">AVAILABLE</span>.
+      {/* Content Wrapper to render on top of stars */}
+      <div className="relative z-10 space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start md:items-center">
+            <div className="p-2.5 rounded-2xl bg-blue-950/40 border border-blue-500/20 text-blue-400 mr-4 shadow-[0_0_20px_rgba(59,130,246,0.15)] flex-shrink-0">
+              <Wrench size={28} />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-violet-400 to-purple-500 bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 2px 8px rgba(59,130,246,0.15))' }}>
+                Workshop & Service Logs
+              </h1>
+              <p className="text-slate-400 text-xs md:text-sm font-medium tracking-wide mt-1">
+                Review vehicle repairs, inspections, and active shop work orders
+              </p>
+            </div>
+          </div>
+          {isFleetManager && (
+            <button
+              onClick={openAddModal}
+              className="flex items-center space-x-2 px-4 py-2.5 text-xs btn-gradient shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] active:scale-95 transition-all duration-200"
+            >
+              <Plus size={16} />
+              <span>Open Maintenance</span>
+            </button>
+          )}
         </div>
-      </div>
+
+        {/* Info message */}
+        <div className="glass-panel p-4 flex items-start space-x-3 text-xs border border-blue-500/20 bg-blue-950/10">
+          <Info size={18} className="text-blue-400 mt-0.5 flex-shrink-0" />
+          <div className="text-slate-400 leading-normal">
+            <span className="font-bold text-slate-200">Lifecycle Logic Rules:</span> Opening a workshop order instantly transitions the vehicle to <span className="text-amber-400 font-semibold font-mono">IN_SHOP</span>, making it unavailable for dispatches. Closing the work order returns it to <span className="text-emerald-400 font-semibold font-mono">AVAILABLE</span>.
+          </div>
+        </div>
 
       {/* Main Table */}
       <div className="glass-panel overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent mx-auto"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto"></div>
             <p className="mt-4 text-slate-400 text-xs">Fetching maintenance logs...</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+            <table className="w-full text-left text-xs border-separate border-spacing-y-2.5">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-900/30 text-slate-400 font-bold">
-                  <th className="p-4">Vehicle</th>
-                  <th className="p-4">Repair Description</th>
-                  <th className="p-4">Cost Center</th>
-                  <th className="p-4">Service Start</th>
-                  <th className="p-4">Service End</th>
-                  <th className="p-4">Status</th>
-                  {isFleetManager && <th className="p-4 text-right">Actions</th>}
+                <tr className="text-slate-400 font-extrabold uppercase tracking-wider text-[9px]">
+                  <th className="p-3 pl-6">Vehicle</th>
+                  <th className="p-3">Repair Description</th>
+                  <th className="p-3">Cost Center</th>
+                  <th className="p-3">Service Start</th>
+                  <th className="p-3">Service End</th>
+                  <th className="p-3">Status</th>
+                  {isFleetManager && <th className="p-3 pr-6 text-right">Actions</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody>
                 {logs.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="p-8 text-center text-slate-500 font-medium">
@@ -161,22 +196,25 @@ export const Maintenance: React.FC = () => {
                   </tr>
                 ) : (
                   [...logs].reverse().map(log => (
-                    <tr key={log.id} className="hover:bg-slate-900/40 transition-colors">
-                      <td className="p-4">
+                    <tr 
+                      key={log.id} 
+                      className="group hover:scale-[1.005] transition-all duration-300"
+                    >
+                      <td className="p-4 pl-6 bg-slate-900/25 border-t border-b first:border-l border-slate-800/80 first:rounded-l-2xl group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
                         <div className="flex flex-col">
                           <span className="text-slate-200 font-semibold">{getVehicleName(log.vehicle_id)}</span>
                           <span className="text-[10px] text-slate-500 font-mono">{getVehicleReg(log.vehicle_id)}</span>
                         </div>
                       </td>
-                      <td className="p-4 text-slate-300 max-w-xs truncate" title={log.description}>{log.description}</td>
-                      <td className="p-4 font-mono text-slate-300 font-bold">${log.cost.toLocaleString()}</td>
-                      <td className="p-4 text-slate-400">
+                      <td className="p-4 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-slate-300 max-w-xs truncate" title={log.description}>{log.description}</td>
+                      <td className="p-4 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 font-mono text-slate-300 font-extrabold">${log.cost.toLocaleString()}</td>
+                      <td className="p-4 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-slate-400">
                         <div className="flex items-center space-x-1.5 font-mono text-[10px]">
                           <Calendar size={12} />
                           <span>{new Date(log.started_at).toLocaleDateString()}</span>
                         </div>
                       </td>
-                      <td className="p-4 text-slate-400">
+                      <td className="p-4 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-slate-400">
                         {log.closed_at ? (
                           <div className="flex items-center space-x-1.5 font-mono text-[10px]">
                             <Calendar size={12} />
@@ -184,22 +222,22 @@ export const Maintenance: React.FC = () => {
                           </div>
                         ) : '—'}
                       </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
+                      <td className="p-4 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-extrabold border ${
                           log.is_active 
-                            ? 'border-amber-500/20 bg-amber-950/20 text-amber-400' 
+                            ? 'border-amber-500/30 bg-amber-950/35 text-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.12)]' 
                             : 'border-slate-700 bg-slate-850 text-slate-400'
                         }`}>
-                          <span className={`mr-1 h-1.5 w-1.5 rounded-full ${log.is_active ? 'bg-amber-400 pulse-dot' : 'bg-slate-400'}`} />
+                          <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${log.is_active ? 'bg-amber-400 animate-pulse' : 'bg-slate-400'}`} />
                           {log.is_active ? 'ACTIVE WORK' : 'RESOLVED'}
                         </span>
                       </td>
                       {isFleetManager && (
-                        <td className="p-4 text-right">
+                        <td className="p-4 pr-6 bg-slate-900/25 border-t border-b last:border-r border-slate-800/80 last:rounded-r-2xl group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-right">
                           {log.is_active && (
                             <button
                               onClick={() => handleCloseLog(log.id)}
-                              className="flex ml-auto items-center space-x-1.5 rounded-lg border border-emerald-900/30 bg-emerald-950/20 px-2.5 py-1 text-[10px] font-bold text-emerald-400 hover:bg-emerald-900/20"
+                              className="flex ml-auto items-center space-x-1.5 rounded-lg border border-emerald-500/30 bg-emerald-950/40 hover:bg-emerald-500 hover:text-white px-2.5 py-1 text-[10px] font-extrabold text-emerald-400 transition-all duration-200 active:scale-95 cursor-pointer shadow-sm shadow-emerald-950/20"
                             >
                               <CheckCircle size={12} />
                               <span>Close Log</span>
@@ -214,6 +252,7 @@ export const Maintenance: React.FC = () => {
             </table>
           </div>
         )}
+      </div>
       </div>
 
       {/* Open Log Modal */}

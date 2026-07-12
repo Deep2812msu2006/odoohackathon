@@ -40,9 +40,9 @@ const LayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
 
       {/* Main Layout Area */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'pl-20' : 'pl-20 md:pl-64'} z-10`}>
+      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'pl-20' : 'pl-20 md:pl-64'}`}>
         <Topbar />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+        <main className="flex-1 overflow-y-auto p-6 md:p-8 relative z-0">
           {children}
         </main>
       </div>

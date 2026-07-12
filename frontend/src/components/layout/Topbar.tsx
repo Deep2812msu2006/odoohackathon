@@ -30,7 +30,7 @@ export const Topbar: React.FC = () => {
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center space-x-2 rounded-xl bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white transition-all duration-200"
           >
-            <UserCheck size={14} className="text-blue-400" />
+            <UserCheck size={14} className="text-cyan-400" />
             <span>Role: {user.role.replace('_', ' ')}</span>
             <RefreshCw size={12} className="text-slate-400" />
           </button>
@@ -56,7 +56,7 @@ export const Topbar: React.FC = () => {
                       }}
                       className={`w-full text-left rounded-xl px-3 py-2 text-xs transition-all duration-200 ${
                         user.role === r.value 
-                          ? 'bg-blue-600/10 border border-blue-500/20 text-blue-400' 
+                          ? 'bg-cyan-600/10 border border-cyan-500/20 text-cyan-400' 
                           : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent'
                       }`}
                     >

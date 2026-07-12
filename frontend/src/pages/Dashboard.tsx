@@ -72,13 +72,13 @@ export const Dashboard: React.FC = () => {
   const regions = Array.from(new Set(vehicles.map(v => v.region).filter(Boolean)));
   const types = Array.from(new Set(vehicles.map(v => v.type)));
 
-  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+  const COLORS = ['#06b6d4', '#8b5cf6', '#10b981', '#f59e0b'];
 
   if (loading) {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-center">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto"></div>
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent mx-auto"></div>
           <p className="mt-4 text-slate-400 text-sm">Loading dashboard analytics...</p>
         </div>
       </div>
@@ -97,29 +97,29 @@ export const Dashboard: React.FC = () => {
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Card 1 */}
-        <div className="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:border-slate-700 transition-all duration-300">
+        <div className="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:border-cyan-500/25 transition-all duration-300">
           <div className="space-y-2">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Fleet Utilization</p>
-            <h3 className="text-3xl font-extrabold text-blue-400">{kpis.fleetUtilizationPct}%</h3>
+            <h3 className="text-3xl font-extrabold text-cyan-400 glow-text-cyan">{kpis.fleetUtilizationPct}%</h3>
             <p className="text-[10px] text-slate-500">Active vs Total non-retired vehicles</p>
           </div>
-          <div className="rounded-2xl bg-blue-950/40 p-4 border border-blue-800/30 text-blue-400">
+          <div className="rounded-2xl bg-cyan-950/45 p-4 border border-cyan-800/30 text-cyan-400">
             <TrendingUp size={24} />
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-teal-500"></div>
         </div>
 
         {/* Card 2 */}
-        <div className="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:border-slate-700 transition-all duration-300">
+        <div className="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:border-violet-500/25 transition-all duration-300">
           <div className="space-y-2">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Trips</p>
-            <h3 className="text-3xl font-extrabold text-emerald-400">{kpis.activeTrips}</h3>
+            <h3 className="text-3xl font-extrabold text-violet-400 glow-text-violet">{kpis.activeTrips}</h3>
             <p className="text-[10px] text-slate-500">{kpis.pendingTrips} more in draft queue</p>
           </div>
-          <div className="rounded-2xl bg-emerald-950/40 p-4 border border-emerald-800/30 text-emerald-400">
+          <div className="rounded-2xl bg-violet-950/45 p-4 border border-violet-800/30 text-violet-400">
             <Map size={24} />
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-purple-500"></div>
         </div>
 
         {/* Card 3 */}
@@ -136,16 +136,16 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Card 4 */}
-        <div className="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:border-slate-700 transition-all duration-300">
+        <div className="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:border-brand-rose/25 transition-all duration-300">
           <div className="space-y-2">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Drivers on Trip</p>
-            <h3 className="text-3xl font-extrabold text-purple-400">{kpis.driversOnDuty}</h3>
+            <h3 className="text-3xl font-extrabold text-rose-400">{kpis.driversOnDuty}</h3>
             <p className="text-[10px] text-slate-500">Active operators dispatched</p>
           </div>
-          <div className="rounded-2xl bg-purple-950/40 p-4 border border-purple-800/30 text-purple-400">
+          <div className="rounded-2xl bg-rose-950/45 p-4 border border-rose-800/30 text-rose-400">
             <Users size={24} />
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-pink-500"></div>
         </div>
       </div>
 
@@ -223,8 +223,8 @@ export const Dashboard: React.FC = () => {
               <AreaChart data={utilizationData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorUtil" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
@@ -234,7 +234,7 @@ export const Dashboard: React.FC = () => {
                   contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px' }}
                   labelStyle={{ color: '#f1f5f9', fontWeight: 'bold' }}
                 />
-                <Area type="monotone" dataKey="utilizationRate" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorUtil)" name="Utilization Rate" />
+                <Area type="monotone" dataKey="utilizationRate" stroke="#06b6d4" strokeWidth={2} fillOpacity={1} fill="url(#colorUtil)" name="Utilization Rate" />
               </AreaChart>
             </ResponsiveContainer>
           </div>

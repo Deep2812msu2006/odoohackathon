@@ -105,14 +105,14 @@ export const Reports: React.FC = () => {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-center">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto"></div>
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent mx-auto"></div>
           <p className="mt-4 text-slate-400 text-sm">Compiling financial graphs and ROI logs...</p>
         </div>
       </div>
     );
   }
 
-  const CHART_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+  const CHART_COLORS = ['#06b6d4', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b'];
 
   return (
     <div className="space-y-6">
@@ -123,7 +123,7 @@ export const Reports: React.FC = () => {
         </div>
         <button
           onClick={handleExportCSV}
-          className="flex items-center space-x-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg hover:bg-blue-500 transition-all"
+          className="flex items-center space-x-2 px-4 py-2.5 text-xs btn-gradient"
         >
           <Download size={16} />
           <span>Export CSV Report</span>
@@ -193,7 +193,7 @@ export const Reports: React.FC = () => {
                 <XAxis dataKey="day" stroke="#94a3b8" fontSize={10} />
                 <YAxis stroke="#94a3b8" fontSize={10} domain={[0, 100]} unit="%" />
                 <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '12px' }} />
-                <Line type="monotone" dataKey="utilizationRate" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} name="Utilization" />
+                <Line type="monotone" dataKey="utilizationRate" stroke="#06b6d4" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} name="Utilization" />
               </LineChart>
             </ResponsiveContainer>
           </div>

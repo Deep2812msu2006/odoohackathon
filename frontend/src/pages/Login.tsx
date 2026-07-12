@@ -33,20 +33,20 @@ export const Login: React.FC = () => {
   };
 
   const roleLogins = [
-    { email: 'manager@transitops.com', label: 'Fleet Manager', desc: 'Frank Manager', icon: UserCheck, color: 'border-blue-500 bg-blue-950/20 text-blue-400' },
-    { email: 'driver@transitops.com', label: 'Driver', desc: 'Dave Driver', icon: Truck, color: 'border-emerald-500 bg-emerald-950/20 text-emerald-400' },
-    { email: 'safety@transitops.com', label: 'Safety Officer', desc: 'Sarah Safety', icon: ShieldCheck, color: 'border-purple-500 bg-purple-950/20 text-purple-400' },
-    { email: 'finance@transitops.com', label: 'Financial Analyst', desc: 'Fiona Finance', icon: Landmark, color: 'border-amber-500 bg-amber-950/20 text-amber-400' }
+    { email: 'manager@transitops.com', label: 'Fleet Manager', desc: 'Frank Manager', icon: UserCheck, color: 'border-cyan-500/20 bg-cyan-950/20 text-cyan-400 hover:border-cyan-500/50 hover:shadow-cyan-950/30' },
+    { email: 'driver@transitops.com', label: 'Driver', desc: 'Dave Driver', icon: Truck, color: 'border-emerald-500/20 bg-emerald-950/20 text-emerald-400 hover:border-emerald-500/50 hover:shadow-emerald-950/30' },
+    { email: 'safety@transitops.com', label: 'Safety Officer', desc: 'Sarah Safety', icon: ShieldCheck, color: 'border-violet-500/20 bg-violet-950/20 text-violet-400 hover:border-violet-500/50 hover:shadow-violet-950/30' },
+    { email: 'finance@transitops.com', label: 'Financial Analyst', desc: 'Fiona Finance', icon: Landmark, color: 'border-amber-500/20 bg-amber-950/20 text-amber-400 hover:border-amber-500/50 hover:shadow-amber-950/30' }
   ];
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-lg space-y-8">
         <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 font-bold text-white shadow-xl shadow-blue-500/20 text-2xl">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-500 to-violet-600 font-bold text-white shadow-xl shadow-cyan-500/20 text-2xl">
             TO
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          <h2 className="mt-6 text-3xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent sm:text-4xl glow-text-cyan">
             TransitOps Portal
           </h2>
           <p className="mt-2 text-sm text-slate-400">
@@ -74,7 +74,7 @@ export const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors duration-200"
+                className="w-full rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none transition-colors duration-200"
               />
             </div>
 
@@ -90,14 +90,14 @@ export const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors duration-200"
+                className="w-full rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none transition-colors duration-200"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="relative w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 focus:outline-none active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+              className="relative w-full py-3 text-sm btn-gradient"
             >
               {loading ? (
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent mx-auto"></div>

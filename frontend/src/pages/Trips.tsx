@@ -210,7 +210,7 @@ export const Trips: React.FC = () => {
         {canMutate && (
           <button
             onClick={openCreateModal}
-            className="flex items-center space-x-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 active:scale-[0.98] transition-all duration-200"
+            className="flex items-center space-x-2 px-4 py-2.5 text-xs btn-gradient"
           >
             <Plus size={16} />
             <span>Create Trip</span>
@@ -226,7 +226,7 @@ export const Trips: React.FC = () => {
             onClick={() => setActiveTab(tab)}
             className={`pb-3 text-xs font-bold transition-all border-b-2 ${
               activeTab === tab 
-                ? 'border-blue-500 text-blue-400' 
+                ? 'border-cyan-500 text-cyan-400' 
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -239,7 +239,7 @@ export const Trips: React.FC = () => {
       <div className="glass-panel overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent mx-auto"></div>
             <p className="mt-4 text-slate-400 text-xs">Querying trip manifests...</p>
           </div>
         ) : (
@@ -298,7 +298,7 @@ export const Trips: React.FC = () => {
                       <td className="p-4">
                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
                           t.status === 'DRAFT' ? 'border-slate-700 bg-slate-800 text-slate-400' :
-                          t.status === 'DISPATCHED' ? 'border-blue-500/20 bg-blue-950/20 text-blue-400' :
+                          t.status === 'DISPATCHED' ? 'border-cyan-500/20 bg-cyan-950/20 text-cyan-400' :
                           t.status === 'COMPLETED' ? 'border-emerald-500/20 bg-emerald-950/20 text-emerald-400' :
                           'border-red-500/20 bg-red-950/20 text-red-400'
                         }`}>
@@ -312,7 +312,7 @@ export const Trips: React.FC = () => {
                               <>
                                 <button
                                   onClick={() => handleDispatch(t.id)}
-                                  className="flex items-center space-x-1 rounded-lg border border-blue-900/30 bg-blue-950/20 px-2 py-1 text-[10px] font-bold text-blue-400 hover:bg-blue-900/20"
+                                  className="flex items-center space-x-1 rounded-lg border border-cyan-900/30 bg-cyan-950/20 px-2 py-1 text-[10px] font-bold text-cyan-400 hover:bg-cyan-900/20"
                                 >
                                   <Play size={10} />
                                   <span>Dispatch</span>
@@ -464,8 +464,8 @@ export const Trips: React.FC = () => {
               )}
 
               <div className="flex justify-end space-x-2 pt-4 border-t border-slate-800">
-                <button type="button" onClick={() => setIsCreateOpen(false)} className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 font-bold text-slate-400">Cancel</button>
-                <button type="submit" disabled={isOverloaded} className="rounded-xl bg-blue-600 px-4 py-2.5 font-bold text-white shadow-lg disabled:opacity-30">Confirm Schedule</button>
+                <button type="button" onClick={() => setIsCreateOpen(false)} className="btn-secondary-custom">Cancel</button>
+                <button type="submit" disabled={isOverloaded} className="px-4 py-2.5 btn-gradient disabled:opacity-30">Confirm Schedule</button>
               </div>
             </form>
           </div>
@@ -528,7 +528,7 @@ export const Trips: React.FC = () => {
               </div>
 
               <div className="flex justify-end space-x-2 pt-4 border-t border-slate-800">
-                <button type="button" onClick={() => setIsCompleteOpen(false)} className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 font-bold text-slate-400">Cancel</button>
+                <button type="button" onClick={() => setIsCompleteOpen(false)} className="btn-secondary-custom">Cancel</button>
                 <button type="submit" className="rounded-xl bg-emerald-600 px-4 py-2.5 font-bold text-white shadow-lg">Submit Completion</button>
               </div>
             </form>

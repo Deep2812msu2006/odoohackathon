@@ -115,7 +115,7 @@ export const Maintenance: React.FC = () => {
         {isFleetManager && (
           <button
             onClick={openAddModal}
-            className="flex items-center space-x-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 active:scale-[0.98] transition-all duration-200"
+            className="flex items-center space-x-2 px-4 py-2.5 text-xs btn-gradient"
           >
             <Plus size={16} />
             <span>Open Maintenance</span>
@@ -125,7 +125,7 @@ export const Maintenance: React.FC = () => {
 
       {/* Info message */}
       <div className="glass-panel p-4 flex items-start space-x-3 text-xs">
-        <Info size={18} className="text-blue-400 mt-0.5 flex-shrink-0" />
+        <Info size={18} className="text-cyan-400 mt-0.5 flex-shrink-0" />
         <div className="text-slate-400 leading-normal">
           <span className="font-bold text-slate-200">Lifecycle Logic Rules:</span> Opening a workshop order instantly transitions the vehicle to <span className="text-amber-400 font-semibold font-mono">IN_SHOP</span>, making it unavailable for dispatches. Closing the work order returns it to <span className="text-emerald-400 font-semibold font-mono">AVAILABLE</span>.
         </div>
@@ -135,7 +135,7 @@ export const Maintenance: React.FC = () => {
       <div className="glass-panel overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent mx-auto"></div>
             <p className="mt-4 text-slate-400 text-xs">Fetching maintenance logs...</p>
           </div>
         ) : (
@@ -279,8 +279,8 @@ export const Maintenance: React.FC = () => {
               </div>
 
               <div className="flex justify-end space-x-2 pt-4 border-t border-slate-800">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 font-bold text-slate-400">Cancel</button>
-                <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2.5 font-bold text-white shadow-lg">Confirm Repair Order</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary-custom">Cancel</button>
+                <button type="submit" className="px-4 py-2.5 btn-gradient">Confirm Repair Order</button>
               </div>
             </form>
           </div>

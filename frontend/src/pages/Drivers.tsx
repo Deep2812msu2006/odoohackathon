@@ -153,7 +153,7 @@ export const Drivers: React.FC = () => {
         {isSafetyOfficer && (
           <button
             onClick={openAddModal}
-            className="flex items-center space-x-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 active:scale-[0.98] transition-all duration-200"
+            className="flex items-center space-x-2 px-4 py-2.5 text-xs btn-gradient"
           >
             <Plus size={16} />
             <span>Add Driver</span>
@@ -181,7 +181,7 @@ export const Drivers: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, license ID, contact..."
-            className="w-full rounded-xl border border-slate-800 bg-slate-900/60 pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:border-blue-500 focus:outline-none transition-colors"
+            className="w-full rounded-xl border border-slate-800 bg-slate-900/60 pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:border-cyan-500 focus:outline-none transition-colors"
           />
         </div>
         <select
@@ -201,7 +201,7 @@ export const Drivers: React.FC = () => {
       <div className="glass-panel overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent mx-auto"></div>
             <p className="mt-4 text-slate-400 text-xs">Accessing operator registry...</p>
           </div>
         ) : (
@@ -345,7 +345,7 @@ export const Drivers: React.FC = () => {
                     type="text"
                     {...register('name')}
                     placeholder="e.g. John Doe"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
                   />
                   {errors.name && <p className="text-[10px] text-red-400">{errors.name.message}</p>}
                 </div>
@@ -356,7 +356,7 @@ export const Drivers: React.FC = () => {
                     type="text"
                     {...register('contact_number')}
                     placeholder="e.g. +1 (555) 019-3829"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
                   />
                   {errors.contact_number && <p className="text-[10px] text-red-400">{errors.contact_number.message}</p>}
                 </div>
@@ -369,7 +369,7 @@ export const Drivers: React.FC = () => {
                     type="text"
                     {...register('license_number')}
                     placeholder="e.g. DL-88912-A"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
                   />
                   {errors.license_number && <p className="text-[10px] text-red-400">{errors.license_number.message}</p>}
                 </div>
@@ -378,7 +378,7 @@ export const Drivers: React.FC = () => {
                   <label className="font-semibold text-slate-400">License Category</label>
                   <select
                     {...register('license_category')}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
                   >
                     <option value="Class A CDL">Class A CDL</option>
                     <option value="Class B CDL">Class B CDL</option>
@@ -394,7 +394,7 @@ export const Drivers: React.FC = () => {
                     type="text"
                     {...register('license_expiry_date')}
                     placeholder="2028-12-31"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
                   />
                   {errors.license_expiry_date && <p className="text-[10px] text-red-400">{errors.license_expiry_date.message}</p>}
                 </div>
@@ -404,7 +404,7 @@ export const Drivers: React.FC = () => {
                   <input
                     type="number"
                     {...register('safety_score', { valueAsNumber: true })}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
                   />
                   {errors.safety_score && <p className="text-[10px] text-red-400">{errors.safety_score.message}</p>}
                 </div>
@@ -414,7 +414,7 @@ export const Drivers: React.FC = () => {
                 <label className="font-semibold text-slate-400">Duty / Safety Status</label>
                 <select
                   {...register('status')}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-blue-500"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
                 >
                   <option value="AVAILABLE">AVAILABLE</option>
                   <option value="ON_TRIP">ON TRIP</option>
@@ -427,13 +427,13 @@ export const Drivers: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 font-bold text-slate-400 hover:text-slate-200"
+                  className="btn-secondary-custom"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-blue-600 px-4 py-2.5 font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 active:scale-[0.98] transition-all"
+                  className="px-4 py-2.5 btn-gradient"
                 >
                   Save Profile
                 </button>

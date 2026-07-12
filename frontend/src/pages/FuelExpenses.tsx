@@ -150,14 +150,14 @@ export const FuelExpenses: React.FC = () => {
           <div className="flex space-x-2">
             <button
               onClick={() => { setFuelError(''); setIsFuelOpen(true); }}
-              className="flex items-center space-x-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 active:scale-[0.98]"
+              className="flex items-center space-x-2 px-4 py-2.5 text-xs btn-gradient"
             >
               <Fuel size={16} />
               <span>Log Fuel fill</span>
             </button>
             <button
               onClick={() => { setExpenseError(''); setIsExpenseOpen(true); }}
-              className="flex items-center space-x-2 rounded-xl bg-slate-800 border border-slate-700 px-4 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-750 active:scale-[0.98]"
+              className="flex items-center space-x-2 px-4 py-2.5 text-xs btn-secondary-custom"
             >
               <Plus size={16} />
               <span>Record Expense</span>
@@ -299,8 +299,8 @@ export const FuelExpenses: React.FC = () => {
               </div>
 
               <div className="flex justify-end space-x-2 pt-4 border-t border-slate-800">
-                <button type="button" onClick={() => setIsFuelOpen(false)} className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 font-bold text-slate-400">Cancel</button>
-                <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2.5 font-bold text-white shadow-lg">Register Receipt</button>
+                <button type="button" onClick={() => setIsFuelOpen(false)} className="btn-secondary-custom">Cancel</button>
+                <button type="submit" className="px-4 py-2.5 btn-gradient">Register Receipt</button>
               </div>
             </form>
           </div>
@@ -317,7 +317,7 @@ export const FuelExpenses: React.FC = () => {
 
             <div>
               <h3 className="text-base font-bold text-slate-100 flex items-center space-x-2">
-                <DollarSign size={18} className="text-blue-500" />
+                <DollarSign size={18} className="text-cyan-400" />
                 <span>Log General Expense Voucher</span>
               </h3>
               <p className="text-[11px] text-slate-400">Registers tolls, other costs or assets related expenses</p>
@@ -363,8 +363,8 @@ export const FuelExpenses: React.FC = () => {
               </div>
 
               <div className="flex justify-end space-x-2 pt-4 border-t border-slate-800">
-                <button type="button" onClick={() => setIsExpenseOpen(false)} className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 font-bold text-slate-400">Cancel</button>
-                <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2.5 font-bold text-white shadow-lg">Confirm Voucher</button>
+                <button type="button" onClick={() => setIsExpenseOpen(false)} className="btn-secondary-custom">Cancel</button>
+                <button type="submit" className="px-4 py-2.5 btn-gradient">Confirm Voucher</button>
               </div>
             </form>
           </div>

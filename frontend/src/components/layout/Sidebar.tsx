@@ -28,7 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
     { to: '/drivers', label: 'Drivers', icon: Users, roles: ['FLEET_MANAGER', 'DRIVER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
     { to: '/trips', label: 'Trips', icon: Navigation, roles: ['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST'] },
     { to: '/maintenance', label: 'Maintenance', icon: Wrench, roles: ['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST'] },
-    { to: '/expenses', label: 'Fuel & Expenses', icon: DollarSign, roles: ['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST'] },
+    { to: '/expenses', label: 'Fuel & Expenses', icon: DollarSign, roles: ['DRIVER', 'FINANCIAL_ANALYST'] },
     { to: '/reports', label: 'Reports & ROI', icon: BarChart3, roles: ['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST'] },
   ];
 

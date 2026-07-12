@@ -99,7 +99,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/expenses" element={
-              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST']}>
+              <ProtectedRoute allowedRoles={['DRIVER', 'FINANCIAL_ANALYST']}>
                 <LayoutWrapper>
                   <FuelExpenses />
                 </LayoutWrapper>

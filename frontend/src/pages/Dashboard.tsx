@@ -9,6 +9,7 @@ import {
 import { 
   Wrench, 
   Map, 
+  MapPin,
   Users, 
   TrendingUp, 
   SlidersHorizontal,
@@ -620,74 +621,200 @@ const OperationalDashboard: React.FC = () => {
   // ==========================================
   if (user.role === 'DRIVER') {
     const myDriversProfile = drivers.find(d => d.name.toLowerCase().includes('dave') || d.name.toLowerCase().includes(user.name.toLowerCase())) || drivers[0];
-    const myActiveTripCount = kpis.activeTrips; // Simulated active
+    
+    // Mock dispatch data
+    const dispatches = [
+      { id: '#t1', route: 'Chicago Depot To Detroit Terminal', cargoWeight: '15.0t', plannedDistance: '280 km', odometerMileage: '-', status: 'DISPATCHED' }
+    ];
 
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center space-x-2">
-            <Activity className="text-violet-500" />
-            <span>Driver Dispatch Console</span>
-          </h1>
-          <p className="text-slate-400 text-sm">Review route sheets, log odometer values, and check safety scores</p>
-        </div>
+      <div className="relative -m-6 md:-m-8 p-6 md:p-8 space-y-6 overflow-hidden rounded-2xl min-h-[calc(100vh-4rem)]" style={{
+        background: 'radial-gradient(ellipse at bottom, #1a1a2e 0%, #0f0f1a 100%)',
+      }}>
+        {/* Parallax Stars Layers */}
+        <div className="safety-stars-layer animate-stars-slow" style={{ width: '1px', height: '1px', boxShadow: starShadows.slow }} />
+        <div className="safety-stars-layer animate-stars-medium" style={{ width: '2px', height: '2px', boxShadow: starShadows.medium }} />
+        <div className="safety-stars-layer animate-stars-fast" style={{ width: '3px', height: '3px', boxShadow: starShadows.fast }} />
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="glass-panel p-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">My Safety Score</p>
-              <h3 className="text-2xl font-extrabold text-violet-400">{myDriversProfile?.safety_score || 92}%</h3>
-              <p className="text-[9px] text-slate-500">Good standing score</p>
+        {/* Content Wrapper to render on top of stars */}
+        <div className="relative z-10 space-y-6">
+          {/* Header */}
+          <div className="flex items-start md:items-center">
+            <div className="p-2.5 rounded-2xl bg-violet-950/40 border border-violet-500/20 text-violet-400 mr-4 shadow-[0_0_20px_rgba(139,92,246,0.15)] flex-shrink-0">
+              <Activity size={28} />
             </div>
-            <div className="rounded-xl bg-violet-950/40 p-3 border border-violet-850/30 text-violet-450">
-              <ShieldCheck size={20} />
+            <div>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-violet-400 via-orange-400 to-amber-300 bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 2px 8px rgba(139,92,246,0.15))' }}>
+                Driver Terminal Home
+              </h1>
+              <p className="text-slate-400 text-xs md:text-sm font-medium tracking-wide mt-1">
+                Welcome back, {user.name}. Personal route manifests and metric overview.
+              </p>
             </div>
           </div>
 
-          <div className="glass-panel p-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Assigned Routes</p>
-              <h3 className="text-2xl font-extrabold text-orange-400">{myActiveTripCount} Scheduled</h3>
-              <p className="text-[9px] text-slate-500">Active trip dispatching</p>
+          {/* Key Metrics Cards */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Safety Rating Card */}
+            <div className="uiverse-card-orange h-full cursor-default">
+              <div className="uiverse-card-inner h-full p-6 flex items-center justify-between relative overflow-hidden group bg-gradient-to-br from-orange-500/5 to-slate-950/90 border-l-4 border-l-orange-500">
+                <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-orange-500/10 blur-xl group-hover:bg-orange-500/20 transition-all duration-500" />
+                <div className="space-y-2 relative z-10">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">SAFETY RATING</p>
+                  <h3 className="text-3xl font-extrabold text-orange-400 glow-text-orange" style={{ textShadow: '0 0 10px rgba(249,115,22,0.3)' }}>{myDriversProfile?.safety_score || 95}%</h3>
+                  <p className="text-[9px] text-slate-500">Current operator compliance score</p>
+                </div>
+                <div className="rounded-2xl bg-orange-950/40 p-4 border border-orange-850/30 text-orange-400 group-hover:border-orange-500/50 group-hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] transition-all duration-300 relative z-10">
+                  <ShieldCheck size={24} />
+                </div>
+              </div>
             </div>
-            <div className="rounded-xl bg-orange-950/40 p-3 border border-orange-850/30 text-orange-400">
-              <Map size={20} />
+
+            {/* Active Dispatches Card */}
+            <div className="uiverse-card-emerald h-full cursor-default">
+              <div className="uiverse-card-inner h-full p-6 flex items-center justify-between relative overflow-hidden group bg-gradient-to-br from-emerald-500/5 to-slate-950/90 border-l-4 border-l-emerald-500">
+                <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-emerald-500/10 blur-xl group-hover:bg-emerald-500/20 transition-all duration-500" />
+                <div className="space-y-2 relative z-10">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ACTIVE DISPATCHES</p>
+                  <h3 className="text-3xl font-extrabold text-emerald-400" style={{ textShadow: '0 0 10px rgba(16,185,129,0.3)' }}>{dispatches.length}</h3>
+                  <p className="text-[9px] text-slate-500">0 pending drafts in queue</p>
+                </div>
+                <div className="rounded-2xl bg-emerald-950/40 p-4 border border-emerald-850/30 text-emerald-400 group-hover:border-emerald-500/50 group-hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 relative z-10">
+                  <Map size={24} />
+                </div>
+              </div>
+            </div>
+
+            {/* Runs Completed Card */}
+            <div className="uiverse-card-emerald h-full cursor-default">
+              <div className="uiverse-card-inner h-full p-6 flex items-center justify-between relative overflow-hidden group bg-gradient-to-br from-emerald-500/5 to-slate-950/90 border-l-4 border-l-emerald-500">
+                <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-emerald-500/10 blur-xl group-hover:bg-emerald-500/20 transition-all duration-500" />
+                <div className="space-y-2 relative z-10">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">RUNS COMPLETED</p>
+                  <h3 className="text-3xl font-extrabold text-emerald-400" style={{ textShadow: '0 0 10px rgba(16,185,129,0.3)' }}>0</h3>
+                  <p className="text-[9px] text-slate-500">Delivered manifests</p>
+                </div>
+                <div className="rounded-2xl bg-emerald-950/40 p-4 border border-emerald-850/30 text-emerald-400 group-hover:border-emerald-500/50 group-hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 relative z-10">
+                  <CheckCircle2 size={24} />
+                </div>
+              </div>
+            </div>
+
+            {/* Distance Driven Card */}
+            <div className="uiverse-card-violet h-full cursor-default">
+              <div className="uiverse-card-inner h-full p-6 flex items-center justify-between relative overflow-hidden group bg-gradient-to-br from-violet-500/5 to-slate-950/90 border-l-4 border-l-violet-500">
+                <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-violet-500/10 blur-xl group-hover:bg-violet-500/20 transition-all duration-500" />
+                <div className="space-y-2 relative z-10">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">DISTANCE DRIVEN</p>
+                  <h3 className="text-3xl font-extrabold text-violet-400" style={{ textShadow: '0 0 10px rgba(139,92,246,0.3)' }}>0 km</h3>
+                  <p className="text-[9px] text-slate-500">Logged route mileage</p>
+                </div>
+                <div className="rounded-2xl bg-violet-950/40 p-4 border border-violet-850/30 text-violet-400 group-hover:border-violet-500/50 group-hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all duration-300 relative z-10">
+                  <MapPin size={24} />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="glass-panel p-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">License Expiry</p>
-              <h3 className="text-2xl font-extrabold text-amber-400">Valid</h3>
-              <p className="text-[9px] text-slate-500">Expires: {myDriversProfile?.license_expiry_date || '2028-12-31'}</p>
+          {/* My Active & Recent Dispatches */}
+          <div className="glass-panel p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <FileSpreadsheet className="text-orange-500" size={18} />
+                <h3 className="text-sm font-bold text-slate-200">My Active & Recent Dispatches</h3>
+              </div>
+              <button className="rounded-lg bg-slate-800/50 border border-slate-700 px-3 py-1.5 text-xs text-slate-400 hover:bg-slate-700 hover:text-slate-200 hover:border-slate-600 transition-all duration-200 shadow-sm">
+                Scheduled runs: {dispatches.length}
+              </button>
             </div>
-            <div className="rounded-xl bg-amber-950/40 p-3 border border-amber-850/30 text-amber-400">
-              <CalendarDays size={20} />
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-separate border-spacing-y-2.5">
+                <thead>
+                  <tr className="text-slate-400 font-extrabold uppercase tracking-wider text-[9px]">
+                    <th className="p-3 pl-6">Route ID</th>
+                    <th className="p-3">Origin / Destination</th>
+                    <th className="p-3">Cargo Weight</th>
+                    <th className="p-3">Planned distance</th>
+                    <th className="p-3">Odometer mileage</th>
+                    <th className="p-3 pr-6">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dispatches.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-slate-500 font-medium">
+                        No dispatches found.
+                      </td>
+                    </tr>
+                  ) : (
+                    dispatches.map(dispatch => (
+                      <tr 
+                        key={dispatch.id} 
+                        className="group hover:scale-[1.005] transition-all duration-300"
+                      >
+                        <td className="p-4 pl-6 bg-slate-900/25 border-t border-b first:border-l border-slate-800/80 first:rounded-l-2xl group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                          <span className="font-extrabold text-slate-200 font-mono tracking-wide">{dispatch.id}</span>
+                        </td>
+                        <td className="p-4 text-slate-400 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                          {dispatch.route}
+                        </td>
+                        <td className="p-4 text-slate-400 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                          {dispatch.cargoWeight}
+                        </td>
+                        <td className="p-4 text-slate-400 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                          {dispatch.plannedDistance}
+                        </td>
+                        <td className="p-4 text-slate-400 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                          {dispatch.odometerMileage}
+                        </td>
+                        <td className="p-4 pr-6 bg-slate-900/25 border-t border-b last:border-r border-slate-800/80 last:rounded-r-2xl group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-extrabold border border-emerald-500/30 bg-emerald-950/35 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.12)]">
+                            <span className="h-1.5 w-1.5 rounded-full mr-1.5 bg-emerald-400 animate-pulse" />
+                            {dispatch.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <div className="glass-panel p-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Duty Status</p>
-              <h3 className="text-2xl font-extrabold text-emerald-450 text-emerald-450">{myDriversProfile?.status || 'AVAILABLE'}</h3>
-              <p className="text-[9px] text-slate-500">Currently logged status</p>
+          {/* Trip Distance Logs and Trip Fuel Ledger */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {/* Trip Distance Logs */}
+            <div className="glass-panel p-6 space-y-4">
+              <div className="flex items-center space-x-2">
+                <MapPin className="text-violet-400" size={18} />
+                <h3 className="text-sm font-bold text-slate-200">Trip Distance Logs</h3>
+              </div>
+              <p className="text-[11px] text-slate-400">Comparison of estimated route distance vs actual driven mileage</p>
+              <div className="h-48 w-full flex items-center justify-center border border-dashed border-slate-800 rounded-xl bg-slate-900/10">
+                <div className="text-center">
+                  <MapPin className="mx-auto text-slate-600 mb-2" size={32} />
+                  <p className="text-xs text-slate-400 font-semibold">No distance logs recorded yet</p>
+                  <p className="text-[10px] text-slate-500 mt-1">Complete trips to see distance comparisons</p>
+                </div>
+              </div>
             </div>
-            <div className="rounded-xl bg-emerald-950/40 p-3 border border-emerald-850/30 text-emerald-400">
-              <Activity size={20} />
-            </div>
-          </div>
-        </div>
 
-        {/* Assigned Dispatch sheet */}
-        <div className="glass-panel p-6 space-y-4">
-          <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-            <FileSpreadsheet className="text-orange-400" size={18} />
-            <h3 className="text-sm font-bold text-slate-200">My Assigned Route Sheet</h3>
-          </div>
-          <div className="p-8 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/10">
-            <Map className="mx-auto text-slate-600 mb-2" size={32} />
-            <p className="text-xs text-slate-400 font-semibold">No active routes dispatched directly to your vehicle profile.</p>
-            <p className="text-[10px] text-slate-500 mt-1">Please report to dispatch hub to schedule routes or check standard schedules.</p>
+            {/* Trip Fuel Ledger */}
+            <div className="glass-panel p-6 space-y-4">
+              <div className="flex items-center space-x-2">
+                <DollarSign className="text-emerald-400" size={18} />
+                <h3 className="text-sm font-bold text-slate-200">Trip Fuel Ledger</h3>
+              </div>
+              <p className="text-[11px] text-slate-400">Fuel consumed in liters per completed dispatch</p>
+              <div className="h-48 w-full flex items-center justify-center border border-dashed border-slate-800 rounded-xl bg-slate-900/10">
+                <div className="text-center">
+                  <DollarSign className="mx-auto text-slate-600 mb-2" size={32} />
+                  <p className="text-xs text-slate-400 font-semibold">No fuel consumption data</p>
+                  <p className="text-[10px] text-slate-500 mt-1">Log fuel entries after completing trips</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

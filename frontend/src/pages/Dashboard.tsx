@@ -1,20 +1,27 @@
 // src/pages/Dashboard.tsx
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../api/apiClient';
+import { useAuth } from '../context/AuthContext';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell
+  PieChart, Pie, Cell, BarChart, Bar
 } from 'recharts';
 import { 
   Wrench, 
   Map, 
   Users, 
   TrendingUp, 
-  SlidersHorizontal 
+  SlidersHorizontal,
+  CreditCard,
+  Percent,
+  Activity,
+  Search,
+  Filter
 } from 'lucide-react';
 import type { Vehicle } from '../api/mockDb';
+import { Card3D } from '../components/common/Card3D';
 
-export const Dashboard: React.FC = () => {
+const OperationalDashboard: React.FC = () => {
   const [kpis, setKpis] = useState({
     activeVehicles: 0,
     availableVehicles: 0,
@@ -346,4 +353,528 @@ export const Dashboard: React.FC = () => {
       </div>
     </div>
   );
+};
+
+const CustomFinancialTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const revenue = data.revenue || 0;
+    const costs = data.costs || 0;
+    const netProfit = revenue - costs;
+    const isProfitable = netProfit >= 0;
+
+    return (
+      <div className="glass-panel p-4 border border-slate-800 text-xs shadow-2xl space-y-2.5 min-w-[200px] backdrop-blur-xl bg-slate-950/90">
+        <p className="font-bold text-slate-100 border-b border-slate-800 pb-1.5">{data.vehicleName} <span className="font-mono text-[10px] text-slate-400">({data.registration})</span></p>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center text-slate-400">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2"></span>
+              Revenue:
+            </span>
+            <span className="font-mono font-bold text-slate-200">${revenue.toLocaleString()}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="flex items-center text-slate-400">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 mr-2"></span>
+              Cost:
+            </span>
+            <span className="font-mono font-bold text-slate-200">${costs.toLocaleString()}</span>
+          </div>
+          <div className="flex items-center justify-between pt-1.5 border-t border-slate-800/80">
+            <span className="text-slate-400">Net Profit:</span>
+            <span className={`font-mono font-extrabold ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {isProfitable ? '+' : ''}${netProfit.toLocaleString()}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+const FinancialDashboard: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+  const [roiData, setRoiData] = useState<any[]>([]);
+  const [costBreakdown, setCostBreakdown] = useState<{ name: string; value: number }[]>([]);
+  const [fuelLogs, setFuelLogs] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
+  const [vehicles, setVehicles] = useState<any[]>([]);
+
+  // Filters for ledger
+  const [selectedVehicle, setSelectedVehicle] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const loadFinancialData = async () => {
+      try {
+        setLoading(true);
+        const [roiRes, costRes, fuelRes, expenseRes, vehicleRes] = await Promise.all([
+          apiClient.reports.vehicleRoi(),
+          apiClient.reports.operationalCost(),
+          apiClient.fuelLogs.list(),
+          apiClient.expenses.list(),
+          apiClient.vehicles.list()
+        ]);
+        setRoiData(roiRes.data);
+        setCostBreakdown(costRes.data.breakdown);
+        setFuelLogs(fuelRes.data);
+        setExpenses(expenseRes.data);
+        setVehicles(vehicleRes.data);
+      } catch (err) {
+        console.error('Failed to load financial dashboard data', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadFinancialData();
+  }, []);
+
+  // Financial calculations
+  const selectedVehicleReg = vehicles.find(v => v.id === selectedVehicle)?.registration_no;
+
+  const displayedRoiData = selectedVehicleReg
+    ? roiData.filter(v => v.registration === selectedVehicleReg)
+    : roiData;
+
+  const displayedCostBreakdown = selectedVehicle
+    ? [
+        { name: 'Fuel', value: fuelLogs.filter(f => f.vehicle_id === selectedVehicle).reduce((sum, f) => sum + f.cost, 0) },
+        { name: 'Maintenance', value: expenses.filter(e => e.vehicle_id === selectedVehicle && e.type === 'maintenance').reduce((sum, e) => sum + e.amount, 0) },
+        { name: 'Tolls', value: expenses.filter(e => e.vehicle_id === selectedVehicle && e.type === 'toll').reduce((sum, e) => sum + e.amount, 0) },
+        { name: 'Other', value: expenses.filter(e => e.vehicle_id === selectedVehicle && e.type === 'other').reduce((sum, e) => sum + e.amount, 0) }
+      ]
+    : costBreakdown;
+
+  const totalRevenue = displayedRoiData.reduce((sum, v) => sum + v.revenue, 0);
+  const totalCosts = displayedCostBreakdown.reduce((sum, item) => sum + item.value, 0);
+  const netProfit = totalRevenue - totalCosts;
+  const profitMargin = totalRevenue > 0 ? Math.round((netProfit / totalRevenue) * 100) : 0;
+  
+  const activeRoiVehicles = displayedRoiData.filter(v => v.acquisitionCost > 0);
+  const avgRoi = activeRoiVehicles.length > 0 
+    ? Math.round((activeRoiVehicles.reduce((sum, v) => sum + v.roi, 0) / activeRoiVehicles.length) * 10) / 10 
+    : 0;
+
+  // Merge transactions chronologically
+  const mergedTransactions = [
+    ...fuelLogs.map(f => ({
+      id: f.id,
+      date: f.date,
+      vehicleId: f.vehicle_id,
+      type: 'Fuel',
+      category: 'Fuel',
+      amount: f.cost,
+      description: `Fuel fill-up: ${f.liters}L`,
+    })),
+    ...expenses.map(e => ({
+      id: e.id,
+      date: e.date,
+      vehicleId: e.vehicle_id,
+      type: 'Expense',
+      category: e.type.charAt(0).toUpperCase() + e.type.slice(1), // 'Toll', 'Maintenance', 'Other'
+      amount: e.amount,
+      description: e.notes || `${e.type} expense`,
+    }))
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // Filters application
+  const filteredTransactions = mergedTransactions.filter(t => {
+    const matchesVehicle = !selectedVehicle || t.vehicleId === selectedVehicle;
+    const matchesCategory = !selectedCategory || t.category.toLowerCase() === selectedCategory.toLowerCase();
+    
+    const vehicleObj = vehicles.find(v => v.id === t.vehicleId);
+    const vehicleReg = vehicleObj?.registration_no || '';
+    const vehicleModel = vehicleObj?.name || '';
+    
+    const matchesSearch = !searchQuery || 
+      t.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicleReg.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicleModel.toLowerCase().includes(searchQuery.toLowerCase());
+      
+    return matchesVehicle && matchesCategory && matchesSearch;
+  });
+
+  const CHART_COLORS = ['#f97316', '#8b5cf6', '#10b981', '#f59e0b'];
+
+  if (loading) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <div className="text-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-orange-500 border-t-transparent mx-auto"></div>
+          <p className="mt-4 text-slate-400 text-sm">Compiling financial graphs and transaction auditing ledger...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Title block */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-100">Financial Operations Control</h1>
+          <p className="text-slate-400 text-sm">Monetary audits, fuel expenses, and ROI performance metrics</p>
+        </div>
+      </div>
+
+      {/* KPI Stats Grid */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Card 1: Revenue */}
+        <Card3D theme="emerald" className="h-[150px]">
+          <div className="card-glare-3d pop-glare-3d"></div>
+          <div className="cyber-lines-3d pop-lines-3d">
+            <span></span><span></span><span></span>
+          </div>
+          <div className="scan-line-3d"></div>
+          <div className="glowing-elements-3d">
+            <div className="glow-1-3d"></div>
+            <div className="glow-2-3d"></div>
+          </div>
+          <div className="card-particles-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div className="corner-elements-3d pop-corners-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          
+          <div className="card-content-3d">
+            <div className="space-y-2 z-10 pop-text-3d">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Revenue</p>
+              <h3 className="text-3xl font-extrabold text-emerald-400 glow-text-emerald">${totalRevenue.toLocaleString()}</h3>
+              <p className="text-[10px] text-slate-500">Trip revenues ($2.50 / km)</p>
+            </div>
+            <div className="rounded-2xl bg-emerald-950/45 p-4 border border-emerald-800/30 text-emerald-400 z-10 pop-icon-3d">
+              <TrendingUp size={24} />
+            </div>
+          </div>
+        </Card3D>
+
+        {/* Card 2: Operating Cost */}
+        <Card3D theme="rose" className="h-[150px]">
+          <div className="card-glare-3d pop-glare-3d"></div>
+          <div className="cyber-lines-3d pop-lines-3d">
+            <span></span><span></span><span></span>
+          </div>
+          <div className="scan-line-3d"></div>
+          <div className="glowing-elements-3d">
+            <div className="glow-1-3d"></div>
+            <div className="glow-2-3d"></div>
+          </div>
+          <div className="card-particles-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div className="corner-elements-3d pop-corners-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          
+          <div className="card-content-3d">
+            <div className="space-y-2 z-10 pop-text-3d">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Operating Cost</p>
+              <h3 className="text-3xl font-extrabold text-rose-400 glow-text-rose">${totalCosts.toLocaleString()}</h3>
+              <p className="text-[10px] text-slate-500">Fuel, maintenance & tolls</p>
+            </div>
+            <div className="rounded-2xl bg-rose-950/45 p-4 border border-rose-800/30 text-rose-400 z-10 pop-icon-3d">
+              <CreditCard size={24} />
+            </div>
+          </div>
+        </Card3D>
+
+        {/* Card 3: Net Profit */}
+        <Card3D theme="violet" className="h-[150px]">
+          <div className="card-glare-3d pop-glare-3d"></div>
+          <div className="cyber-lines-3d pop-lines-3d">
+            <span></span><span></span><span></span>
+          </div>
+          <div className="scan-line-3d"></div>
+          <div className="glowing-elements-3d">
+            <div className="glow-1-3d"></div>
+            <div className="glow-2-3d"></div>
+          </div>
+          <div className="card-particles-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div className="corner-elements-3d pop-corners-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          
+          <div className="card-content-3d">
+            <div className="space-y-2 z-10 pop-text-3d">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Net Profit</p>
+              <h3 className="text-3xl font-extrabold text-violet-400 glow-text-violet">${netProfit.toLocaleString()}</h3>
+              <p className="text-[10px] text-slate-500">Operating margin: {profitMargin}%</p>
+            </div>
+            <div className="rounded-2xl bg-violet-950/45 p-4 border border-violet-800/30 text-violet-400 z-10 pop-icon-3d">
+              <Activity size={24} />
+            </div>
+          </div>
+        </Card3D>
+
+        {/* Card 4: Average ROI */}
+        <Card3D theme="amber" className="h-[150px]">
+          <div className="card-glare-3d pop-glare-3d"></div>
+          <div className="cyber-lines-3d pop-lines-3d">
+            <span></span><span></span><span></span>
+          </div>
+          <div className="scan-line-3d"></div>
+          <div className="glowing-elements-3d">
+            <div className="glow-1-3d"></div>
+            <div className="glow-2-3d"></div>
+          </div>
+          <div className="card-particles-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div className="corner-elements-3d pop-corners-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          
+          <div className="card-content-3d">
+            <div className="space-y-2 z-10 pop-text-3d">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Average ROI</p>
+              <h3 className="text-3xl font-extrabold text-amber-400">{avgRoi}%</h3>
+              <p className="text-[10px] text-slate-500">Yield across fleet acquisition</p>
+            </div>
+            <div className="rounded-2xl bg-amber-950/40 p-4 border border-amber-800/30 text-amber-400 z-10 pop-icon-3d">
+              <Percent size={24} />
+            </div>
+          </div>
+        </Card3D>
+      </div>
+
+      {/* Main Financial Visualizations */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Revenue vs Cost per Vehicle */}
+        <div className="glass-panel-chart-3d space-y-4">
+          <div className="corner-elements-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-200">Revenue vs. Operating Cost Comparison</h3>
+            <p className="text-[11px] text-slate-400">Total generated revenue vs. aggregate expenses for each vehicle registry</p>
+          </div>
+          <div className="h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={displayedRoiData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barGap={6}>
+                <defs>
+                  <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#34d399" stopOpacity={0.95}/>
+                    <stop offset="95%" stopColor="#059669" stopOpacity={0.25}/>
+                  </linearGradient>
+                  <linearGradient id="costsGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#fb7185" stopOpacity={0.95}/>
+                    <stop offset="95%" stopColor="#e11d48" stopOpacity={0.25}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4" stroke="#1e293b" vertical={false} strokeOpacity={0.4} />
+                <XAxis dataKey="registration" stroke="#4c647b" fontSize={9} axisLine={false} tickLine={false} dy={8} />
+                <YAxis 
+                  stroke="#4c647b" 
+                  fontSize={9} 
+                  axisLine={false} 
+                  tickLine={false} 
+                  dx={-8}
+                  tickFormatter={(val) => `$${(val / 1000).toFixed(0)}k`} 
+                />
+                <Tooltip content={<CustomFinancialTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)', radius: 6 }} />
+                <Bar dataKey="revenue" fill="url(#revenueGrad)" stroke="#10b981" strokeWidth={1} name="Revenue" radius={[5, 5, 0, 0]} barSize={10} />
+                <Bar dataKey="costs" fill="url(#costsGrad)" stroke="#f43f5e" strokeWidth={1} name="Operating Cost" radius={[5, 5, 0, 0]} barSize={10} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Operating Cost Breakdown Donut */}
+        <div className="glass-panel-chart-3d space-y-4">
+          <div className="corner-elements-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-200">Operational Cost Centers</h3>
+            <p className="text-[11px] text-slate-400">Total expense distributions across category types</p>
+          </div>
+          <div className="h-72 w-full flex flex-col justify-between">
+            <div className="h-56 w-full relative">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={displayedCostBreakdown}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={55}
+                    outerRadius={75}
+                    paddingAngle={4}
+                    dataKey="value"
+                  >
+                    {displayedCostBreakdown.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px' }}
+                    itemStyle={{ color: '#cbd5e1' }}
+                    formatter={(value) => [`$${value}`, 'Amount']}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              {/* Central Donut Overlay */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Total Expenses</span>
+                <span className="text-xl font-extrabold text-slate-200 glow-text-orange">${totalCosts.toLocaleString()}</span>
+              </div>
+            </div>
+            
+            {/* Custom Pie Legend Grid */}
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-800/80 pt-3">
+              {displayedCostBreakdown.map((entry, idx) => (
+                <div key={entry.name} className="flex items-center justify-between text-xs bg-slate-950/20 px-3 py-1.5 rounded-xl border border-slate-800/30">
+                  <div className="flex items-center space-x-2">
+                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}></div>
+                    <span className="text-slate-400 font-medium truncate">{entry.name}:</span>
+                  </div>
+                  <span className="text-slate-200 font-bold font-mono ml-2">${entry.value.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Transaction Auditing Ledger */}
+      <div className="glass-panel">
+        <div className="px-6 py-5 border-b border-slate-800/60 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-slate-200">Transaction Auditing Ledger</h3>
+            <p className="text-[11px] text-slate-400">Chronological history of fuel logs and operational expense invoices</p>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search */}
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Search size={14} />
+              </span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search registration or notes..."
+                className="pl-9 pr-4 py-2 w-48 rounded-xl border border-slate-800 bg-slate-900 text-xs text-slate-200 focus:outline-none focus:border-orange-500/50"
+              />
+            </div>
+
+            {/* Vehicle Filter */}
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Filter size={12} />
+              </span>
+              <select
+                value={selectedVehicle}
+                onChange={(e) => setSelectedVehicle(e.target.value)}
+                className="pl-9 pr-4 py-2 rounded-xl border border-slate-800 bg-slate-900 text-xs text-slate-200 focus:outline-none focus:border-orange-500/50"
+              >
+                <option value="">All Vehicles</option>
+                {vehicles.map(v => (
+                  <option key={v.id} value={v.id}>{v.registration_no} ({v.name})</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Category Filter */}
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Filter size={12} />
+              </span>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="pl-9 pr-4 py-2 rounded-xl border border-slate-800 bg-slate-900 text-xs text-slate-200 focus:outline-none focus:border-orange-500/50"
+              >
+                <option value="">All Categories</option>
+                <option value="Fuel">Fuel</option>
+                <option value="Toll">Toll</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-slate-800 bg-slate-900/30 text-slate-400 font-bold">
+                <th className="p-4">Date</th>
+                <th className="p-4">Vehicle</th>
+                <th className="p-4">Category</th>
+                <th className="p-4">Description</th>
+                <th className="p-4 text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60">
+              {filteredTransactions.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-8 text-center text-slate-500 font-medium">
+                    No transactions found matching current filters.
+                  </td>
+                </tr>
+              ) : (
+                filteredTransactions.map(t => {
+                  const vehicleObj = vehicles.find(v => v.id === t.vehicleId);
+                  
+                  // Stylings for categories
+                  const catColors: Record<string, string> = {
+                    Fuel: 'border-blue-500/20 bg-blue-950/20 text-blue-400',
+                    Maintenance: 'border-amber-500/20 bg-amber-950/20 text-amber-400',
+                    Toll: 'border-purple-500/20 bg-purple-950/20 text-purple-400',
+                    Other: 'border-slate-600/20 bg-slate-800/20 text-slate-400'
+                  };
+                  
+                  return (
+                    <tr key={t.id} className="hover:bg-slate-900/40 transition-colors">
+                      <td className="p-4 text-slate-400 font-mono">
+                        {new Date(t.date).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </td>
+                      <td className="p-4">
+                        <p className="font-semibold text-slate-200">{vehicleObj?.name || '—'}</p>
+                        <span className="font-mono text-[10px] text-slate-500">{vehicleObj?.registration_no || '—'}</span>
+                      </td>
+                      <td className="p-4">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${catColors[t.category] || catColors['Other']}`}>
+                          {t.category}
+                        </span>
+                      </td>
+                      <td className="p-4 text-slate-300 max-w-xs truncate" title={t.description}>
+                        {t.description}
+                      </td>
+                      <td className="p-4 text-right font-mono font-bold text-slate-200">
+                        ${t.amount.toLocaleString()}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const Dashboard: React.FC = () => {
+  const { user } = useAuth();
+
+  if (user?.role === 'FINANCIAL_ANALYST') {
+    return <FinancialDashboard />;
+  }
+
+  return <OperationalDashboard />;
 };

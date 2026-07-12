@@ -139,6 +139,33 @@ export const FuelExpenses: React.FC = () => {
     }))
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+  const getBadgeStyles = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'fuel':
+        return {
+          pill: 'bg-blue-950/20 text-blue-400 border border-blue-500/20',
+          dot: 'bg-blue-400 pulse-dot'
+        };
+      case 'maintenance':
+        return {
+          pill: 'bg-amber-950/20 text-amber-400 border border-amber-500/20',
+          dot: 'bg-amber-400 pulse-dot'
+        };
+      case 'toll':
+        return {
+          pill: 'bg-purple-950/20 text-purple-400 border border-purple-500/20',
+          dot: 'bg-purple-400 pulse-dot'
+        };
+      default:
+        return {
+          pill: 'bg-slate-800/20 text-slate-400 border border-slate-700/20',
+          dot: 'bg-slate-400'
+        };
+    }
+  };
+
+  const maxTotalCost = Math.max(...aggregatedStats.map(s => s.totalCost), 1);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -168,35 +195,57 @@ export const FuelExpenses: React.FC = () => {
 
       {/* Aggregate Stats per vehicle */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="glass-panel p-6 lg:col-span-1 space-y-4 h-fit">
+        <div className="universe-card space-y-4 h-fit">
+          <div className="corner-elements-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
           <div>
             <h3 className="text-sm font-bold text-slate-200">Cost Center Per Vehicle</h3>
             <p className="text-[11px] text-slate-400">Summed fuel + maintenance + toll expenses</p>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-4 pt-1">
             {loading ? (
               <div className="h-20 flex items-center justify-center text-slate-500 text-xs">Computing statistics...</div>
             ) : aggregatedStats.length === 0 ? (
               <p className="text-xs text-slate-500 text-center">No vehicle data available.</p>
             ) : (
-              aggregatedStats.slice(0, 5).map(stat => (
-                <div key={stat.id} className="rounded-xl bg-slate-900/40 p-3 border border-slate-800 flex items-center justify-between text-xs">
-                  <div>
-                    <h4 className="font-semibold text-slate-200">{stat.name}</h4>
-                    <span className="font-mono text-[10px] text-slate-500">{stat.registration}</span>
+              aggregatedStats.slice(0, 5).map(stat => {
+                const fuelPct = stat.totalCost > 0 ? (stat.fuelCost / stat.totalCost) * 100 : 0;
+                const expensePct = stat.totalCost > 0 ? (stat.expenseCost / stat.totalCost) * 100 : 0;
+                const relativeWidthPct = (stat.totalCost / maxTotalCost) * 100;
+                
+                return (
+                  <div key={stat.id} className="rounded-xl bg-slate-900/30 p-3.5 border border-slate-800/60 space-y-3 hover:border-slate-700/65 transition-colors">
+                    <div className="flex justify-between items-start text-xs">
+                      <div>
+                        <p className="font-semibold text-slate-200">{stat.name}</p>
+                        <span className="font-mono text-[9px] text-slate-500">{stat.registration}</span>
+                      </div>
+                      <span className="font-mono font-bold text-slate-300">${stat.totalCost.toLocaleString()}</span>
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden flex" style={{ width: `${Math.max(relativeWidthPct, 15)}%` }}>
+                        <div className="bg-blue-500 h-full" style={{ width: `${fuelPct}%` }} title={`Fuel: ${Math.round(fuelPct)}%`} />
+                        <div className="bg-amber-500 h-full" style={{ width: `${expensePct}%` }} title={`Expenses: ${Math.round(expensePct)}%`} />
+                      </div>
+                      <div className="flex justify-between text-[9px] text-slate-500">
+                        <span>Fuel: {Math.round(fuelPct)}%</span>
+                        <span>Other: {Math.round(expensePct)}%</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold font-mono text-slate-200">${stat.totalCost.toLocaleString()}</p>
-                    <span className="text-[9px] text-slate-500 font-mono">Fuel: ${stat.fuelCost.toLocaleString()}</span>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
 
         {/* Ledger table */}
-        <div className="glass-panel p-6 lg:col-span-2 space-y-4">
+        <div className="universe-card lg:col-span-2 space-y-4">
+          <div className="corner-elements-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
           <div>
             <h3 className="text-sm font-bold text-slate-200">Recent Operational Ledger Entries</h3>
             <p className="text-[11px] text-slate-400">Chronological history of fuel logs and invoices</p>
@@ -222,28 +271,28 @@ export const FuelExpenses: React.FC = () => {
                       <td colSpan={5} className="p-8 text-center text-slate-500 font-medium">No transactions recorded.</td>
                     </tr>
                   ) : (
-                    ledgerTimeline.map((item, idx) => (
-                      <tr key={item.id + idx} className="hover:bg-slate-900/40 transition-colors">
-                        <td className="p-3 text-slate-400 font-mono text-[10px]">
-                          {new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </td>
-                        <td className="p-3 font-semibold text-slate-300">
-                          {getVehicleName(item.vehicle_id)} <span className="font-mono text-[9px] text-slate-500">({getVehicleReg(item.vehicle_id)})</span>
-                        </td>
-                        <td className="p-3">
-                          <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-[9px] font-bold ${
-                            item.category === 'fuel' ? 'bg-blue-950/20 text-blue-400 border border-blue-800/20' :
-                            item.category === 'maintenance' ? 'bg-amber-950/20 text-amber-400 border border-amber-800/20' :
-                            item.category === 'toll' ? 'bg-emerald-950/20 text-emerald-400 border border-emerald-800/20' :
-                            'bg-slate-800 text-slate-400 border border-transparent'
-                          }`}>
-                            {item.type}
-                          </span>
-                        </td>
-                        <td className="p-3 text-slate-400 italic max-w-xs truncate" title={item.details}>{item.details}</td>
-                        <td className="p-3 text-right font-mono font-bold text-slate-200">${item.amount.toLocaleString()}</td>
-                      </tr>
-                    ))
+                    ledgerTimeline.map((item, idx) => {
+                      const badge = getBadgeStyles(item.category);
+                      return (
+                        <tr key={item.id + idx} className="hover:bg-slate-900/40 transition-colors">
+                          <td className="p-3 text-slate-400 font-mono text-[10px]">
+                            {new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </td>
+                          <td className="p-3">
+                            <p className="font-semibold text-slate-200">{getVehicleName(item.vehicle_id)}</p>
+                            <span className="font-mono text-[9px] text-slate-500">{getVehicleReg(item.vehicle_id)}</span>
+                          </td>
+                          <td className="p-3">
+                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-bold ${badge.pill}`}>
+                              <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${badge.dot}`} />
+                              {item.type}
+                            </span>
+                          </td>
+                          <td className="p-3 text-slate-400 italic max-w-xs truncate" title={item.details}>{item.details}</td>
+                          <td className="p-3 text-right font-mono font-bold text-slate-200">${item.amount.toLocaleString()}</td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -255,30 +304,34 @@ export const FuelExpenses: React.FC = () => {
       {/* Fuel fill log Modal */}
       {isFuelOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl space-y-6">
-            <button onClick={() => setIsFuelOpen(false)} className="absolute right-4 top-4 text-slate-400 hover:text-slate-200">
+          <div className="relative w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/90 backdrop-blur-xl p-6 shadow-2xl space-y-6 overflow-hidden">
+            <div className="corner-elements-3d">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            
+            <button onClick={() => setIsFuelOpen(false)} className="absolute right-4 top-4 text-slate-400 hover:text-slate-200 z-10">
               <X size={16} />
             </button>
 
-            <div>
+            <div className="z-10 relative">
               <h3 className="text-base font-bold text-slate-100 flex items-center space-x-2">
-                <Fuel size={18} className="text-blue-500" />
+                <Fuel size={18} className="text-emerald-400" />
                 <span>Log Fuel Fill Purchase</span>
               </h3>
-              <p className="text-[11px] text-slate-400">Registers fuel volume and cost metrics against vehicle ledger</p>
+              <p className="text-[11px] text-slate-400 mt-1">Registers fuel volume and cost metrics against vehicle ledger</p>
             </div>
 
             {fuelError && (
-              <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-3 text-xs text-red-400 flex items-center space-x-2">
+              <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-3 text-xs text-red-400 flex items-center space-x-2 z-10 relative">
                 <AlertTriangle size={14} />
                 <span>{fuelError}</span>
               </div>
             )}
 
-            <form onSubmit={handleFuelSubmit(onFuelSubmit)} className="space-y-4 text-xs">
+            <form onSubmit={handleFuelSubmit(onFuelSubmit)} className="space-y-4 text-xs z-10 relative">
               <div className="space-y-1">
                 <label className="font-semibold text-slate-400">Vehicle</label>
-                <select {...regFuel('vehicle_id')} className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none">
+                <select {...regFuel('vehicle_id')} className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all duration-200">
                   <option value="">Select vehicle...</option>
                   {vehicles.map(v => <option key={v.id} value={v.id}>{v.name} ({v.registration_no})</option>)}
                 </select>
@@ -288,12 +341,12 @@ export const FuelExpenses: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="font-semibold text-slate-400">Liters Loaded</label>
-                  <input type="number" {...regFuel('liters', { valueAsNumber: true })} placeholder="e.g. 150" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none" />
+                  <input type="number" {...regFuel('liters', { valueAsNumber: true })} placeholder="e.g. 150" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all duration-200" />
                   {fuelErrors.liters && <p className="text-[10px] text-red-400">{fuelErrors.liters.message}</p>}
                 </div>
                 <div className="space-y-1">
                   <label className="font-semibold text-slate-400">Total Bill Cost ($)</label>
-                  <input type="number" {...regFuel('cost', { valueAsNumber: true })} placeholder="e.g. 270" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none" />
+                  <input type="number" {...regFuel('cost', { valueAsNumber: true })} placeholder="e.g. 270" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all duration-200" />
                   {fuelErrors.cost && <p className="text-[10px] text-red-400">{fuelErrors.cost.message}</p>}
                 </div>
               </div>
@@ -310,31 +363,35 @@ export const FuelExpenses: React.FC = () => {
       {/* Record Expense Modal */}
       {isExpenseOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl space-y-6">
-            <button onClick={() => setIsExpenseOpen(false)} className="absolute right-4 top-4 text-slate-400 hover:text-slate-200">
+          <div className="relative w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/90 backdrop-blur-xl p-6 shadow-2xl space-y-6 overflow-hidden">
+            <div className="corner-elements-3d">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            
+            <button onClick={() => setIsExpenseOpen(false)} className="absolute right-4 top-4 text-slate-400 hover:text-slate-200 z-10">
               <X size={16} />
             </button>
 
-            <div>
+            <div className="z-10 relative">
               <h3 className="text-base font-bold text-slate-100 flex items-center space-x-2">
-                <DollarSign size={18} className="text-orange-400" />
+                <DollarSign size={18} className="text-orange-500" />
                 <span>Log General Expense Voucher</span>
               </h3>
-              <p className="text-[11px] text-slate-400">Registers tolls, other costs or assets related expenses</p>
+              <p className="text-[11px] text-slate-400 mt-1">Registers tolls, other costs or assets related expenses</p>
             </div>
 
             {expenseError && (
-              <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-3 text-xs text-red-400 flex items-center space-x-2">
+              <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-3 text-xs text-red-400 flex items-center space-x-2 z-10 relative">
                 <AlertTriangle size={14} />
                 <span>{expenseError}</span>
               </div>
             )}
 
-            <form onSubmit={handleExpenseSubmit(onExpenseSubmit)} className="space-y-4 text-xs">
+            <form onSubmit={handleExpenseSubmit(onExpenseSubmit)} className="space-y-4 text-xs z-10 relative">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="font-semibold text-slate-400">Target Vehicle</label>
-                  <select {...regExpense('vehicle_id')} className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none">
+                  <select {...regExpense('vehicle_id')} className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all duration-200">
                     <option value="">Select vehicle...</option>
                     {vehicles.map(v => <option key={v.id} value={v.id}>{v.name} ({v.registration_no})</option>)}
                   </select>
@@ -343,7 +400,7 @@ export const FuelExpenses: React.FC = () => {
 
                 <div className="space-y-1">
                   <label className="font-semibold text-slate-400">Expense Category</label>
-                  <select {...regExpense('type')} className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none">
+                  <select {...regExpense('type')} className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all duration-200">
                     <option value="toll">Highway Toll</option>
                     <option value="maintenance">Maintenance</option>
                     <option value="other">Other Supplies</option>
@@ -353,13 +410,13 @@ export const FuelExpenses: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="font-semibold text-slate-400">Invoice / Bill Amount ($)</label>
-                <input type="number" {...regExpense('amount', { valueAsNumber: true })} placeholder="e.g. 50" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none" />
+                <input type="number" {...regExpense('amount', { valueAsNumber: true })} placeholder="e.g. 50" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all duration-200" />
                 {expenseErrors.amount && <p className="text-[10px] text-red-400">{expenseErrors.amount.message}</p>}
               </div>
 
               <div className="space-y-1">
                 <label className="font-semibold text-slate-400">Notes / Details</label>
-                <input type="text" {...regExpense('notes')} placeholder="e.g. Toll booth receipts for Route-I90" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none" />
+                <input type="text" {...regExpense('notes')} placeholder="e.g. Toll booth receipts for Route-I90" className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all duration-200" />
               </div>
 
               <div className="flex justify-end space-x-2 pt-4 border-t border-slate-800">

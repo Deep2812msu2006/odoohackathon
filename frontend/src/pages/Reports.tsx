@@ -4,9 +4,28 @@ import { apiClient } from '../api/apiClient';
 import { useAuth } from '../context/AuthContext';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, Cell
+  AreaChart, Area
 } from 'recharts';
 import { Download, BarChart2, TrendingUp, DollarSign, Percent, AlertTriangle } from 'lucide-react';
+
+const CustomReportTooltip = ({ active, payload, label, unit }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="glass-panel p-3 px-3.5 border border-slate-800 text-xs shadow-2xl space-y-1.5 backdrop-blur-xl bg-slate-950/95 rounded-xl min-w-[150px]">
+        {label && <p className="font-bold text-slate-100 border-b border-slate-800 pb-1 mb-1.5">{label}</p>}
+        {payload.map((item: any, index: number) => (
+          <div key={index} className="flex items-center justify-between space-x-6">
+            <span className="text-slate-400 font-medium">{item.name || 'Value'}:</span>
+            <span className="font-mono font-bold text-slate-200">
+              {item.value.toLocaleString()}{unit || item.unit || ''}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 export const Reports: React.FC = () => {
   const { user } = useAuth();
@@ -112,8 +131,6 @@ export const Reports: React.FC = () => {
     );
   }
 
-  const CHART_COLORS = ['#f97316', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b'];
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -132,7 +149,10 @@ export const Reports: React.FC = () => {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Chart 1: Vehicle ROI */}
-        <div className="glass-panel p-6 space-y-4">
+        <div className="universe-card space-y-4">
+          <div className="corner-elements-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
           <div className="flex items-center space-x-2">
             <Percent size={18} className="text-purple-400" />
             <h3 className="text-sm font-bold text-slate-200">Return on Investment (ROI) %</h3>
@@ -143,22 +163,27 @@ export const Reports: React.FC = () => {
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={roiData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="registration" stroke="#94a3b8" fontSize={9} />
-                <YAxis stroke="#94a3b8" fontSize={9} unit="%" />
-                <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '12px' }} formatter={(val) => [`${val}%`, 'ROI']} />
-                <Bar dataKey="roi" radius={[4, 4, 0, 0]}>
-                  {roiData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                  ))}
-                </Bar>
+                <defs>
+                  <linearGradient id="roiGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.95}/>
+                    <stop offset="95%" stopColor="#7c3aed" stopOpacity={0.25}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4" stroke="#1e293b" vertical={false} strokeOpacity={0.4} />
+                <XAxis dataKey="registration" stroke="#4c647b" fontSize={9} axisLine={false} tickLine={false} dy={8} />
+                <YAxis stroke="#4c647b" fontSize={9} axisLine={false} tickLine={false} dx={-8} unit="%" />
+                <Tooltip content={<CustomReportTooltip unit="%" />} cursor={{ fill: 'rgba(255,255,255,0.03)', radius: 6 }} />
+                <Bar dataKey="roi" fill="url(#roiGrad)" stroke="#8b5cf6" strokeWidth={1} radius={[5, 5, 0, 0]} barSize={14} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Chart 2: Fuel Efficiency */}
-        <div className="glass-panel p-6 space-y-4">
+        <div className="universe-card space-y-4">
+          <div className="corner-elements-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
           <div className="flex items-center space-x-2">
             <TrendingUp size={18} className="text-emerald-400" />
             <h3 className="text-sm font-bold text-slate-200">Fuel Efficiency Rate (Liters / 100 km)</h3>
@@ -169,18 +194,27 @@ export const Reports: React.FC = () => {
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={fuelEfficiency} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="registration" stroke="#94a3b8" fontSize={9} />
-                <YAxis stroke="#94a3b8" fontSize={9} unit="L" />
-                <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '12px' }} formatter={(val) => [`${val} L/100km`, 'Fuel Rate']} />
-                <Bar dataKey="fuelEfficiency" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <defs>
+                  <linearGradient id="fuelEfficiencyGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#34d399" stopOpacity={0.95}/>
+                    <stop offset="95%" stopColor="#059669" stopOpacity={0.25}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4" stroke="#1e293b" vertical={false} strokeOpacity={0.4} />
+                <XAxis dataKey="registration" stroke="#4c647b" fontSize={9} axisLine={false} tickLine={false} dy={8} />
+                <YAxis stroke="#4c647b" fontSize={9} axisLine={false} tickLine={false} dx={-8} unit="L" />
+                <Tooltip content={<CustomReportTooltip unit=" L/100km" />} cursor={{ fill: 'rgba(255,255,255,0.03)', radius: 6 }} />
+                <Bar dataKey="fuelEfficiency" fill="url(#fuelEfficiencyGrad)" stroke="#10b981" strokeWidth={1} radius={[5, 5, 0, 0]} barSize={14} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Chart 3: Weekly Utilization rate */}
-        <div className="glass-panel p-6 space-y-4">
+        <div className="universe-card space-y-4">
+          <div className="corner-elements-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
           <div className="flex items-center space-x-2">
             <BarChart2 size={18} className="text-blue-400" />
             <h3 className="text-sm font-bold text-slate-200">Operational Capacity Rate</h3>
@@ -188,19 +222,37 @@ export const Reports: React.FC = () => {
           <p className="text-[11px] text-slate-400">Weekly utilization trends across active dispatches</p>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={utilization} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="day" stroke="#94a3b8" fontSize={10} />
-                <YAxis stroke="#94a3b8" fontSize={10} domain={[0, 100]} unit="%" />
-                <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '12px' }} />
-                <Line type="monotone" dataKey="utilizationRate" stroke="#f97316" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} name="Utilization" />
-              </LineChart>
+              <AreaChart data={utilization} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="utilizationGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.45}/>
+                    <stop offset="95%" stopColor="#f97316" stopOpacity={0.01}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4" stroke="#1e293b" vertical={false} strokeOpacity={0.4} />
+                <XAxis dataKey="day" stroke="#4c647b" fontSize={9} axisLine={false} tickLine={false} dy={8} />
+                <YAxis stroke="#4c647b" fontSize={9} axisLine={false} tickLine={false} dx={-8} domain={[0, 100]} unit="%" />
+                <Tooltip content={<CustomReportTooltip unit="%" />} />
+                <Area 
+                  type="monotone" 
+                  dataKey="utilizationRate" 
+                  stroke="#f97316" 
+                  strokeWidth={3} 
+                  fill="url(#utilizationGrad)"
+                  dot={{ r: 4, fill: '#f97316', stroke: '#0f172a', strokeWidth: 2 }} 
+                  activeDot={{ r: 6, fill: '#ffedd5', stroke: '#f97316', strokeWidth: 2 }} 
+                  name="Utilization" 
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Financial table summary */}
-        <div className="glass-panel p-6 space-y-4">
+        <div className="universe-card space-y-4">
+          <div className="corner-elements-3d">
+            <span></span><span></span><span></span><span></span>
+          </div>
           <div className="flex items-center space-x-2">
             <DollarSign size={18} className="text-amber-400" />
             <h3 className="text-sm font-bold text-slate-200">Total Profitability Matrix</h3>
@@ -211,22 +263,24 @@ export const Reports: React.FC = () => {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-slate-800 bg-slate-900/30 text-slate-400 font-bold">
-                  <th className="p-2">Vehicle</th>
-                  <th className="p-2 text-right">Revenue</th>
-                  <th className="p-2 text-right">Expenses</th>
-                  <th className="p-2 text-right text-emerald-400">Net Profit</th>
+                  <th className="p-3">Vehicle</th>
+                  <th className="p-3 text-right">Revenue</th>
+                  <th className="p-3 text-right">Expenses</th>
+                  <th className="p-3 text-right text-emerald-400">Net Profit</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/40">
                 {roiData.map(v => (
-                  <tr key={v.registration} className="hover:bg-slate-900/20">
-                    <td className="p-2">
-                      <p className="font-semibold text-slate-300">{v.vehicleName}</p>
+                  <tr key={v.registration} className="hover:bg-slate-900/40 transition-colors">
+                    <td className="p-3">
+                      <p className="font-semibold text-slate-200">{v.vehicleName}</p>
                       <span className="font-mono text-[9px] text-slate-500">{v.registration}</span>
                     </td>
-                    <td className="p-2 text-right font-mono text-slate-300">${v.revenue.toLocaleString()}</td>
-                    <td className="p-2 text-right font-mono text-slate-400">${v.costs.toLocaleString()}</td>
-                    <td className="p-2 text-right font-mono font-bold text-emerald-400">${v.netProfit.toLocaleString()}</td>
+                    <td className="p-3 text-right font-mono text-slate-300">${v.revenue.toLocaleString()}</td>
+                    <td className="p-3 text-right font-mono text-slate-400">${v.costs.toLocaleString()}</td>
+                    <td className="p-3 text-right font-mono font-extrabold text-emerald-400 glow-text-emerald">
+                      +${v.netProfit.toLocaleString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>

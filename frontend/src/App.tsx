@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { Sidebar } from './components/layout/Sidebar';
 import { Topbar } from './components/layout/Topbar';
+import { SpaceBackground } from './components/layout/SpaceBackground';
 
 // Pages
 import { Login } from './pages/Login';
@@ -28,14 +29,18 @@ const queryClient = new QueryClient({
 
 const LayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex relative">
+      {/* Space stars scrolling background - ONLY FOR FINANCIAL ANALYST */}
+      {user?.role === 'FINANCIAL_ANALYST' && <SpaceBackground />}
+
       {/* Sidebar navigation */}
       <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
 
       {/* Main Layout Area */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'pl-20' : 'pl-20 md:pl-64'}`}>
+      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'pl-20' : 'pl-20 md:pl-64'} z-10`}>
         <Topbar />
         <main className="flex-1 overflow-y-auto p-6 md:p-8">
           {children}
@@ -52,7 +57,7 @@ export const App: React.FC = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-            
+
             <Route path="/" element={
               <ProtectedRoute>
                 <LayoutWrapper>
@@ -62,7 +67,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/vehicles" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER']}>
                 <LayoutWrapper>
                   <Vehicles />
                 </LayoutWrapper>
@@ -70,7 +75,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/drivers" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'SAFETY_OFFICER']}>
                 <LayoutWrapper>
                   <Drivers />
                 </LayoutWrapper>
@@ -78,7 +83,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/trips" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'DRIVER']}>
                 <LayoutWrapper>
                   <Trips />
                 </LayoutWrapper>
@@ -86,7 +91,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/maintenance" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER']}>
                 <LayoutWrapper>
                   <Maintenance />
                 </LayoutWrapper>
@@ -94,7 +99,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/expenses" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'FINANCIAL_ANALYST']}>
                 <LayoutWrapper>
                   <FuelExpenses />
                 </LayoutWrapper>
@@ -102,7 +107,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/reports" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'FINANCIAL_ANALYST']}>
                 <LayoutWrapper>
                   <Reports />
                 </LayoutWrapper>

@@ -1,7 +1,7 @@
 // src/components/layout/Topbar.tsx
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { UserCheck } from 'lucide-react';
+import { UserCheck, LogOut } from 'lucide-react';
 
 export const Topbar: React.FC = () => {
   const { user, logout } = useAuth();

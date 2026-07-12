@@ -2300,6 +2300,36 @@
   box-shadow: 0px 0px 30px 2px rgba(16, 185, 129, 0.35);
 }
 
+.uiverse-card-blue {
+  background-image: linear-gradient(163deg, #0ca4db 0%, #043144 100%);
+  border-radius: 20px;
+  transition: all 0.3s;
+  padding: 1.5px;
+}
+.uiverse-card-blue:hover {
+  box-shadow: 0px 0px 30px 2px rgba(12, 164, 219, 0.35);
+}
+
+.uiverse-card-cyan {
+  background-image: linear-gradient(163deg, #06b6d4 0%, #0e7490 100%);
+  border-radius: 20px;
+  transition: all 0.3s;
+  padding: 1.5px;
+}
+.uiverse-card-cyan:hover {
+  box-shadow: 0px 0px 30px 2px rgba(6, 182, 212, 0.35);
+}
+
+.uiverse-card-amber {
+  background-image: linear-gradient(163deg, #f59e0b 0%, #b45309 100%);
+  border-radius: 20px;
+  transition: all 0.3s;
+  padding: 1.5px;
+}
+.uiverse-card-amber:hover {
+  box-shadow: 0px 0px 30px 2px rgba(245, 158, 11, 0.35);
+}
+
 .uiverse-card-inner {
   background-color: #0d141b; /* matches slate-900 card background */
   border-radius: 19px;

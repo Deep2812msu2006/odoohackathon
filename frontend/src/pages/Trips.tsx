@@ -634,7 +634,8 @@ export const Trips: React.FC = () => {
                   );
                 })}
               </div>
-            </div></div>
+            </div>
+          </div>
 
             {/* Map Legend */}
             <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-sm rounded-lg px-4 py-3 border border-slate-700 z-20">
@@ -653,6 +654,7 @@ export const Trips: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
           </div>
 
       {/* Create Modal */}

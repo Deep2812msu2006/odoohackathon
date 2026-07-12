@@ -1,8 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-cyan: #06b6d4;
-  --color-brand-violet: #8b5cf6;
+  /* Override Slate to be a deep luxury obsidian teal/cyan-midnight */
+  --color-slate-950: #060a0d; /* Ultra deep dark teal-obsidian canvas background */
+  --color-slate-900: #0d141b; /* Card panel background */
+  --color-slate-800: #1b2631; /* Borders, grid dividers, inactive states */
+  --color-slate-700: #293847; /* Inactive selections / muted borders */
+  --color-slate-600: #394d61;
+  --color-slate-500: #4c647b;
+  --color-slate-400: #7b94ad; /* Muted text / labels */
+  --color-slate-300: #a9bed1;
+  --color-slate-200: #d6e3f0; /* Default reading text */
+  --color-slate-100: #f3f7fa; /* Highlighted headers */
+
+  /* Override Cyan to be a vibrant cyberpunk neon mint/aquamarine */
+  --color-cyan-950: #002219;
+  --color-cyan-900: #003a2b;
+  --color-cyan-800: #00563f;
+  --color-cyan-700: #007455;
+  --color-cyan-600: #00936c;
+  --color-cyan-500: #00f5a0; /* Glowing Neon Mint Green */
+  --color-cyan-400: #39ffc2;
+  --color-cyan-300: #7effdc;
+  --color-cyan-200: #b3ffe8;
+  --color-cyan-100: #e6fff6;
+
+  /* Override Violet to be an electric purple/indigo */
+  --color-violet-950: #12052b;
+  --color-violet-900: #240b54;
+  --color-violet-800: #3a1580;
+  --color-violet-700: #5422ad;
+  --color-violet-600: #7232d6;
+  --color-violet-500: #8f4ff6; /* Neon Violet */
+  --color-violet-400: #aa74ff;
+  --color-violet-300: #c69dff;
+  --color-violet-200: #e2c6ff;
+  --color-violet-100: #f3e8ff;
+
+  /* Override Blue to be a deep electric cyan-blue */
+  --color-blue-950: #021a24;
+  --color-blue-900: #043144;
+  --color-blue-800: #064b66;
+  --color-blue-700: #07668a;
+  --color-blue-600: #0983af;
+  --color-blue-500: #0ca4db;
+  --color-blue-400: #38bdf8;
+  --color-blue-300: #7dd3fc;
+  --color-blue-200: #bae6fd;
+  --color-blue-100: #e0f2fe;
+
+  /* Accent brand variables */
+  --color-brand-cyan: var(--color-cyan-500);
+  --color-brand-violet: var(--color-violet-500);
   --color-brand-rose: #f43f5e;
   --color-brand-amber: #f59e0b;
 }
@@ -30,11 +79,11 @@
 
 /* Glowing Glassmorphism panels */
 .glass-panel {
-  @apply bg-slate-900/40 backdrop-blur-md border border-slate-800 rounded-2xl shadow-lg transition-all duration-300;
+  @apply bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-lg transition-all duration-300;
 }
 
 .glass-panel-glow {
-  @apply bg-slate-900/40 backdrop-blur-md border border-slate-800 rounded-2xl shadow-lg transition-all duration-300 hover:border-cyan-500/30 hover:shadow-cyan-950/20 hover:shadow-xl;
+  @apply bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-lg transition-all duration-300 hover:border-cyan-500/25 hover:shadow-cyan-950/10 hover:shadow-xl;
 }
 
 /* Glowing gradients for primary actions */
@@ -58,9 +107,10 @@
 
 /* Glowing text classes */
 .glow-text-cyan {
-  text-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+  text-shadow: 0 0 10px rgba(0, 245, 160, 0.2);
 }
 
 .glow-text-violet {
-  text-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+  text-shadow: 0 0 10px rgba(143, 79, 246, 0.2);
 }
+

@@ -125,7 +125,7 @@ export const Maintenance: React.FC = () => {
 
       {/* Info message */}
       <div className="glass-panel p-4 flex items-start space-x-3 text-xs">
-        <Info size={18} className="text-cyan-400 mt-0.5 flex-shrink-0" />
+        <Info size={18} className="text-orange-400 mt-0.5 flex-shrink-0" />
         <div className="text-slate-400 leading-normal">
           <span className="font-bold text-slate-200">Lifecycle Logic Rules:</span> Opening a workshop order instantly transitions the vehicle to <span className="text-amber-400 font-semibold font-mono">IN_SHOP</span>, making it unavailable for dispatches. Closing the work order returns it to <span className="text-emerald-400 font-semibold font-mono">AVAILABLE</span>.
         </div>
@@ -135,7 +135,7 @@ export const Maintenance: React.FC = () => {
       <div className="glass-panel overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent mx-auto"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent mx-auto"></div>
             <p className="mt-4 text-slate-400 text-xs">Fetching maintenance logs...</p>
           </div>
         ) : (

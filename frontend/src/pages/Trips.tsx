@@ -226,7 +226,7 @@ export const Trips: React.FC = () => {
             onClick={() => setActiveTab(tab)}
             className={`pb-3 text-xs font-bold transition-all border-b-2 ${
               activeTab === tab 
-                ? 'border-cyan-500 text-cyan-400' 
+                ? 'border-orange-500 text-orange-400' 
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -239,7 +239,7 @@ export const Trips: React.FC = () => {
       <div className="glass-panel overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent mx-auto"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent mx-auto"></div>
             <p className="mt-4 text-slate-400 text-xs">Querying trip manifests...</p>
           </div>
         ) : (
@@ -298,7 +298,7 @@ export const Trips: React.FC = () => {
                       <td className="p-4">
                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
                           t.status === 'DRAFT' ? 'border-slate-700 bg-slate-800 text-slate-400' :
-                          t.status === 'DISPATCHED' ? 'border-cyan-500/20 bg-cyan-950/20 text-cyan-400' :
+                          t.status === 'DISPATCHED' ? 'border-orange-500/20 bg-orange-950/20 text-orange-400' :
                           t.status === 'COMPLETED' ? 'border-emerald-500/20 bg-emerald-950/20 text-emerald-400' :
                           'border-red-500/20 bg-red-950/20 text-red-400'
                         }`}>
@@ -312,7 +312,7 @@ export const Trips: React.FC = () => {
                               <>
                                 <button
                                   onClick={() => handleDispatch(t.id)}
-                                  className="flex items-center space-x-1 rounded-lg border border-cyan-900/30 bg-cyan-950/20 px-2 py-1 text-[10px] font-bold text-cyan-400 hover:bg-cyan-900/20"
+                                  className="flex items-center space-x-1 rounded-lg border border-orange-900/30 bg-orange-950/20 px-2 py-1 text-[10px] font-bold text-orange-400 hover:bg-orange-900/20"
                                 >
                                   <Play size={10} />
                                   <span>Dispatch</span>

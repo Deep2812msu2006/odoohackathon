@@ -317,7 +317,7 @@ export const FuelExpenses: React.FC = () => {
 
             <div>
               <h3 className="text-base font-bold text-slate-100 flex items-center space-x-2">
-                <DollarSign size={18} className="text-cyan-400" />
+                <DollarSign size={18} className="text-orange-400" />
                 <span>Log General Expense Voucher</span>
               </h3>
               <p className="text-[11px] text-slate-400">Registers tolls, other costs or assets related expenses</p>

@@ -157,7 +157,7 @@ export const Vehicles: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by reg plate, model name, type..."
-            className="w-full rounded-xl border border-slate-800 bg-slate-900/60 pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:border-cyan-500 focus:outline-none transition-colors"
+            className="w-full rounded-xl border border-slate-800 bg-slate-900/60 pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:border-orange-500 focus:outline-none transition-colors"
           />
         </div>
         <div className="flex items-center space-x-3">
@@ -294,7 +294,7 @@ export const Vehicles: React.FC = () => {
                     type="text"
                     {...register('registration_no')}
                     placeholder="e.g. TX-4809"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
                   />
                   {errors.registration_no && <p className="text-[10px] text-red-400">{errors.registration_no.message}</p>}
                 </div>
@@ -305,7 +305,7 @@ export const Vehicles: React.FC = () => {
                     type="text"
                     {...register('name')}
                     placeholder="e.g. Volvo FH16"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
                   />
                   {errors.name && <p className="text-[10px] text-red-400">{errors.name.message}</p>}
                 </div>
@@ -318,7 +318,7 @@ export const Vehicles: React.FC = () => {
                     type="text"
                     {...register('type')}
                     placeholder="e.g. Semi-Truck"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
                   />
                   {errors.type && <p className="text-[10px] text-red-400">{errors.type.message}</p>}
                 </div>
@@ -329,7 +329,7 @@ export const Vehicles: React.FC = () => {
                     type="text"
                     {...register('region')}
                     placeholder="e.g. North"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
                   />
                   {errors.region && <p className="text-[10px] text-red-400">{errors.region.message}</p>}
                 </div>
@@ -341,7 +341,7 @@ export const Vehicles: React.FC = () => {
                   <input
                     type="number"
                     {...register('odometer', { valueAsNumber: true })}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
                   />
                   {errors.odometer && <p className="text-[10px] text-red-400">{errors.odometer.message}</p>}
                 </div>
@@ -351,7 +351,7 @@ export const Vehicles: React.FC = () => {
                   <input
                     type="number"
                     {...register('max_load_capacity', { valueAsNumber: true })}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
                   />
                   {errors.max_load_capacity && <p className="text-[10px] text-red-400">{errors.max_load_capacity.message}</p>}
                 </div>
@@ -361,7 +361,7 @@ export const Vehicles: React.FC = () => {
                   <input
                     type="number"
                     {...register('acquisition_cost', { valueAsNumber: true })}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
                   />
                   {errors.acquisition_cost && <p className="text-[10px] text-red-400">{errors.acquisition_cost.message}</p>}
                 </div>
@@ -371,7 +371,7 @@ export const Vehicles: React.FC = () => {
                 <label className="font-semibold text-slate-400">Vehicle Status</label>
                 <select
                   {...register('status')}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
                 >
                   <option value="AVAILABLE">AVAILABLE</option>
                   <option value="ON_TRIP">ON TRIP</option>

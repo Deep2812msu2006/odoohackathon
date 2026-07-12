@@ -39,16 +39,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
       <div className="flex h-16 items-center justify-between px-4 border-b border-slate-800">
         {!collapsed && (
           <div className="flex items-center space-x-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-500 to-violet-600 font-bold text-white shadow-lg shadow-cyan-500/20">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-orange-500 to-violet-600 font-bold text-white shadow-lg shadow-orange-500/20">
               TO
             </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 via-teal-300 to-violet-400 bg-clip-text text-transparent glow-text-cyan">
+            <span className="text-lg font-bold bg-gradient-to-r from-orange-400 via-amber-300 to-violet-400 bg-clip-text text-transparent glow-text-orange">
               TransitOps
             </span>
           </div>
         )}
         {collapsed && (
-          <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-500 to-violet-600 font-bold text-white shadow-lg shadow-cyan-500/20">
+          <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-orange-500 to-violet-600 font-bold text-white shadow-lg shadow-orange-500/20">
             TO
           </div>
         )}
@@ -70,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
               className={({ isActive }) => 
                 `flex items-center rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 group border-l-4 ${
                   isActive 
-                    ? 'bg-gradient-to-r from-cyan-950/30 to-violet-950/20 border-cyan-500 text-cyan-400 shadow-md shadow-cyan-950/10' 
+                    ? 'bg-gradient-to-r from-orange-950/30 to-violet-950/20 border-orange-500 text-orange-400 shadow-md shadow-orange-950/10' 
                     : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 border-transparent'
                 }`
               }
@@ -90,7 +90,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold text-slate-200">{user.name}</p>
-              <span className="inline-block mt-0.5 rounded-full bg-cyan-950/40 border border-cyan-500/20 px-2 py-0.5 text-[10px] font-semibold text-cyan-400">
+              <span className="inline-block mt-0.5 rounded-full bg-orange-950/40 border border-orange-500/20 px-2 py-0.5 text-[10px] font-semibold text-orange-400">
                 {user.role.replace('_', ' ')}
               </span>
             </div>

@@ -33,7 +33,7 @@ export const Login: React.FC = () => {
   };
 
   const roleLogins = [
-    { email: 'manager@transitops.com', label: 'Fleet Manager', desc: 'Frank Manager', icon: UserCheck, color: 'border-cyan-500/20 bg-cyan-950/20 text-cyan-400 hover:border-cyan-500/50 hover:shadow-cyan-950/30' },
+    { email: 'manager@transitops.com', label: 'Fleet Manager', desc: 'Frank Manager', icon: UserCheck, color: 'border-orange-500/20 bg-orange-950/20 text-orange-400 hover:border-orange-500/50 hover:shadow-orange-950/30' },
     { email: 'driver@transitops.com', label: 'Driver', desc: 'Dave Driver', icon: Truck, color: 'border-emerald-500/20 bg-emerald-950/20 text-emerald-400 hover:border-emerald-500/50 hover:shadow-emerald-950/30' },
     { email: 'safety@transitops.com', label: 'Safety Officer', desc: 'Sarah Safety', icon: ShieldCheck, color: 'border-violet-500/20 bg-violet-950/20 text-violet-400 hover:border-violet-500/50 hover:shadow-violet-950/30' },
     { email: 'finance@transitops.com', label: 'Financial Analyst', desc: 'Fiona Finance', icon: Landmark, color: 'border-amber-500/20 bg-amber-950/20 text-amber-400 hover:border-amber-500/50 hover:shadow-amber-950/30' }
@@ -43,10 +43,10 @@ export const Login: React.FC = () => {
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-lg space-y-8">
         <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-500 to-violet-600 font-bold text-white shadow-xl shadow-cyan-500/20 text-2xl">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-orange-500 to-violet-600 font-bold text-white shadow-xl shadow-orange-500/20 text-2xl">
             TO
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent sm:text-4xl glow-text-cyan">
+          <h2 className="mt-6 text-3xl font-extrabold tracking-tight bg-gradient-to-r from-orange-400 to-violet-400 bg-clip-text text-transparent sm:text-4xl glow-text-orange">
             TransitOps Portal
           </h2>
           <p className="mt-2 text-sm text-slate-400">
@@ -74,7 +74,7 @@ export const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none transition-colors duration-200"
+                className="w-full rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-orange-500 focus:outline-none transition-colors duration-200"
               />
             </div>
 
@@ -90,7 +90,7 @@ export const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none transition-colors duration-200"
+                className="w-full rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-orange-500 focus:outline-none transition-colors duration-200"
               />
             </div>
 

@@ -50,15 +50,15 @@
   --color-blue-100: #e0f2fe;
 
   /* Accent brand variables */
-  --color-brand-cyan: var(--color-cyan-500);
-  --color-brand-violet: var(--color-violet-500);
+  --color-brand-orange: #f97316;
+  --color-brand-violet: #8b5cf6;
   --color-brand-rose: #f43f5e;
   --color-brand-amber: #f59e0b;
 }
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-white;
+    @apply bg-slate-950 text-slate-100 antialiased selection:bg-orange-500 selection:text-white;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
@@ -83,12 +83,12 @@
 }
 
 .glass-panel-glow {
-  @apply bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-lg transition-all duration-300 hover:border-cyan-500/25 hover:shadow-cyan-950/10 hover:shadow-xl;
+  @apply bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-lg transition-all duration-300 hover:border-orange-500/25 hover:shadow-orange-950/10 hover:shadow-xl;
 }
 
 /* Glowing gradients for primary actions */
 .btn-gradient {
-  @apply relative overflow-hidden rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 font-bold text-white shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/20 active:scale-[0.98] transition-all duration-200 cursor-pointer;
+  @apply relative overflow-hidden rounded-xl bg-gradient-to-r from-orange-500 to-violet-600 font-bold text-white shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 active:scale-[0.98] transition-all duration-200 cursor-pointer;
 }
 
 .btn-secondary-custom {
@@ -106,11 +106,11 @@
 }
 
 /* Glowing text classes */
-.glow-text-cyan {
-  text-shadow: 0 0 10px rgba(0, 245, 160, 0.2);
+.glow-text-orange {
+  text-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
 }
 
 .glow-text-violet {
-  text-shadow: 0 0 10px rgba(143, 79, 246, 0.2);
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
 }
 

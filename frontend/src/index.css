@@ -114,6 +114,10 @@
   text-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
 }
 
+.glow-text-blue {
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
 
 /* Custom 3D Cyber Card styling */
 .container-3d {
@@ -2301,17 +2305,17 @@
 }
 
 .uiverse-card-blue {
-  background-image: linear-gradient(163deg, #0ca4db 0%, #043144 100%);
+  background-image: linear-gradient(163deg, #3b82f6 0%, #1d4ed8 100%);
   border-radius: 20px;
   transition: all 0.3s;
   padding: 1.5px;
 }
 .uiverse-card-blue:hover {
-  box-shadow: 0px 0px 30px 2px rgba(12, 164, 219, 0.35);
+  box-shadow: 0px 0px 30px 2px rgba(59, 130, 246, 0.35);
 }
 
 .uiverse-card-cyan {
-  background-image: linear-gradient(163deg, #06b6d4 0%, #0e7490 100%);
+  background-image: linear-gradient(163deg, #06b6d4 0%, #0891b2 100%);
   border-radius: 20px;
   transition: all 0.3s;
   padding: 1.5px;
@@ -2321,7 +2325,7 @@
 }
 
 .uiverse-card-amber {
-  background-image: linear-gradient(163deg, #f59e0b 0%, #b45309 100%);
+  background-image: linear-gradient(163deg, #f59e0b 0%, #d97706 100%);
   border-radius: 20px;
   transition: all 0.3s;
   padding: 1.5px;

@@ -804,7 +804,7 @@ const OperationalDashboard: React.FC = () => {
   }
 
   // ==========================================
-  // RENDER 4: FLEET MANAGER DASHBOARD (Original View)
+  // RENDER 4: FLEET MANAGER DASHBOARD (Enhanced Space Theme)
   // ==========================================
   // Filtered vehicles count and list
   const filteredVehicles = vehicles.filter(v => {
@@ -818,266 +818,344 @@ const OperationalDashboard: React.FC = () => {
   const types = Array.from(new Set(vehicles.map(v => v.type)));
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100">Operations Control</h1>
-          <p className="text-slate-400 text-sm">Live fleet tracking and performance metrics</p>
-        </div>
-      </div>
+    <div className="relative -m-6 md:-m-8 p-6 md:p-8 space-y-6 overflow-hidden rounded-2xl min-h-[calc(100vh-4rem)]" style={{
+      background: 'radial-gradient(ellipse at bottom, #1a1a2e 0%, #0f0f1a 100%)',
+    }}>
+      {/* Parallax Stars Layers */}
+      <div className="safety-stars-layer animate-stars-slow" style={{ width: '1px', height: '1px', boxShadow: starShadows.slow }} />
+      <div className="safety-stars-layer animate-stars-medium" style={{ width: '2px', height: '2px', boxShadow: starShadows.medium }} />
+      <div className="safety-stars-layer animate-stars-fast" style={{ width: '3px', height: '3px', boxShadow: starShadows.fast }} />
 
-      {/* KPI Stats Grid */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Card 1 */}
-        <div className="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:border-orange-500/25 transition-all duration-300">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Fleet Utilization</p>
-            <h3 className="text-3xl font-extrabold text-orange-400 glow-text-orange">{kpis.fleetUtilizationPct}%</h3>
-            <p className="text-[10px] text-slate-500">Active vs Total non-retired vehicles</p>
-          </div>
-          <div className="rounded-2xl bg-orange-950/45 p-4 border border-orange-800/30 text-orange-400">
-            <TrendingUp size={24} />
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-amber-500"></div>
-        </div>
-
-        {/* Card 2 */}
-        <div className="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:border-violet-500/25 transition-all duration-300">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Trips</p>
-            <h3 className="text-3xl font-extrabold text-violet-400 glow-text-violet">{kpis.activeTrips}</h3>
-            <p className="text-[10px] text-slate-500">{kpis.pendingTrips} more in draft queue</p>
-          </div>
-          <div className="rounded-2xl bg-violet-950/45 p-4 border border-violet-800/30 text-violet-400">
-            <Map size={24} />
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-purple-500"></div>
-        </div>
-
-        {/* Card 3 */}
-        <div className="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:border-slate-700 transition-all duration-300">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">In Service Bay</p>
-            <h3 className="text-3xl font-extrabold text-amber-400">{kpis.inMaintenance}</h3>
-            <p className="text-[10px] text-slate-500">Vehicles in workshop shop</p>
-          </div>
-          <div className="rounded-2xl bg-amber-950/40 p-4 border border-amber-800/30 text-amber-400">
-            <Wrench size={24} />
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-yellow-500"></div>
-        </div>
-
-        {/* Card 4 */}
-        <div className="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:border-brand-rose/25 transition-all duration-300">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Drivers on Trip</p>
-            <h3 className="text-3xl font-extrabold text-rose-400">{kpis.driversOnDuty}</h3>
-            <p className="text-[10px] text-slate-500">Active operators dispatched</p>
-          </div>
-          <div className="rounded-2xl bg-rose-950/45 p-4 border border-rose-800/30 text-rose-400">
-            <Users size={24} />
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-pink-500"></div>
-        </div>
-      </div>
-
-      {/* Interactive Filters Panel */}
-      <div className="glass-panel p-6">
-        <div className="flex items-center space-x-2 mb-4">
-          <SlidersHorizontal size={16} className="text-slate-400" />
-          <h2 className="text-sm font-semibold text-slate-300">Quick Vehicle Filter Matrix</h2>
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500 uppercase">Region</label>
-            <select
-              value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-slate-200 focus:outline-none"
-            >
-              <option value="">All Regions</option>
-              {regions.map(r => <option key={r} value={r}>{r}</option>)}
-            </select>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500 uppercase">Vehicle Status</label>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-slate-200 focus:outline-none"
-            >
-              <option value="">All Statuses</option>
-              <option value="AVAILABLE">AVAILABLE</option>
-              <option value="ON_TRIP">ON TRIP</option>
-              <option value="IN_SHOP">IN SHOP</option>
-              <option value="RETIRED">RETIRED</option>
-            </select>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500 uppercase">Body Class / Type</label>
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-slate-200 focus:outline-none"
-            >
-              <option value="">All Types</option>
-              {types.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
+      {/* Content Wrapper to render on top of stars */}
+      <div className="relative z-10 space-y-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-start md:items-center">
+            <div className="p-2.5 rounded-2xl bg-blue-950/40 border border-blue-500/20 text-blue-400 mr-4 shadow-[0_0_20px_rgba(59,130,246,0.15)] flex-shrink-0">
+              <Activity size={28} />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 2px 8px rgba(59,130,246,0.15))' }}>
+                Fleet Operations Command
+              </h1>
+              <p className="text-slate-400 text-xs md:text-sm font-medium tracking-wide mt-1">
+                Real-time fleet tracking, utilization metrics, and vehicle performance analytics
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Live Filter Summary */}
-        <div className="mt-4 flex items-center justify-between border-t border-slate-800/60 pt-4 text-xs text-slate-400">
-          <span>Matching fleet vehicles: <strong className="text-slate-200">{filteredVehicles.length}</strong></span>
-          {(selectedRegion || selectedStatus || selectedType) && (
-            <button 
-              onClick={() => { setSelectedRegion(''); setSelectedStatus(''); setSelectedType(''); }}
-              className="text-blue-400 hover:text-blue-300 font-semibold"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-      </div>
+        {/* Enhanced KPI Stats Grid */}
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Card 1 - Fleet Utilization */}
+          <div className="uiverse-card-blue h-full cursor-default">
+            <div className="uiverse-card-inner h-full p-6 flex items-center justify-between relative overflow-hidden group bg-gradient-to-br from-blue-500/5 to-slate-950/90">
+              <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-blue-500/10 blur-xl group-hover:bg-blue-500/20 transition-all duration-500" />
+              <div className="space-y-2 relative z-10">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Fleet Utilization</p>
+                <h3 className="text-3xl font-extrabold text-blue-400 glow-text-blue" style={{ textShadow: '0 0 10px rgba(59,130,246,0.3)' }}>{kpis.fleetUtilizationPct}%</h3>
+                <p className="text-[10px] text-slate-500">Active vs Total vehicles</p>
+              </div>
+              <div className="rounded-2xl bg-blue-950/40 p-4 border border-blue-850/30 text-blue-400 group-hover:border-blue-500/50 group-hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all duration-300 relative z-10">
+                <TrendingUp size={24} />
+              </div>
+            </div>
+          </div>
 
-      {/* Charts section */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Utilization trend chart */}
-        <div className="glass-panel p-6 lg:col-span-2 space-y-4">
-          <div>
-            <h3 className="text-sm font-bold text-slate-200">Historical Fleet Utilization</h3>
-            <p className="text-[11px] text-slate-400">Average active usage percent over the past 7 days</p>
+          {/* Card 2 - Active Trips */}
+          <div className="uiverse-card-cyan h-full cursor-default">
+            <div className="uiverse-card-inner h-full p-6 flex items-center justify-between relative overflow-hidden group bg-gradient-to-br from-cyan-500/5 to-slate-950/90">
+              <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-cyan-500/10 blur-xl group-hover:bg-cyan-500/20 transition-all duration-500" />
+              <div className="space-y-2 relative z-10">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Trips</p>
+                <h3 className="text-3xl font-extrabold text-cyan-400" style={{ textShadow: '0 0 10px rgba(34,211,238,0.3)' }}>{kpis.activeTrips}</h3>
+                <p className="text-[10px] text-slate-500">{kpis.pendingTrips} in draft queue</p>
+              </div>
+              <div className="rounded-2xl bg-cyan-950/40 p-4 border border-cyan-850/30 text-cyan-400 group-hover:border-cyan-500/50 group-hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] transition-all duration-300 relative z-10">
+                <Map size={24} />
+              </div>
+            </div>
           </div>
-          <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={utilizationData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorUtil" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="day" stroke="#94a3b8" fontSize={10} />
-                <YAxis stroke="#94a3b8" fontSize={10} domain={[0, 100]} unit="%" />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px' }}
-                  labelStyle={{ color: '#f1f5f9', fontWeight: 'bold' }}
-                />
-                <Area type="monotone" dataKey="utilizationRate" stroke="#f97316" strokeWidth={2} fillOpacity={1} fill="url(#colorUtil)" name="Utilization Rate" />
-              </AreaChart>
-            </ResponsiveContainer>
+
+          {/* Card 3 - In Service Bay */}
+          <div className="uiverse-card-amber h-full cursor-default">
+            <div className="uiverse-card-inner h-full p-6 flex items-center justify-between relative overflow-hidden group bg-gradient-to-br from-amber-500/5 to-slate-950/90">
+              <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-amber-500/10 blur-xl group-hover:bg-amber-500/20 transition-all duration-500" />
+              <div className="space-y-2 relative z-10">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">In Service Bay</p>
+                <h3 className="text-3xl font-extrabold text-amber-400" style={{ textShadow: '0 0 10px rgba(245,158,11,0.3)' }}>{kpis.inMaintenance}</h3>
+                <p className="text-[10px] text-slate-500">Vehicles in workshop</p>
+              </div>
+              <div className="rounded-2xl bg-amber-950/40 p-4 border border-amber-850/30 text-amber-400 group-hover:border-amber-500/50 group-hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all duration-300 relative z-10">
+                <Wrench size={24} />
+              </div>
+            </div>
+          </div>
+
+          {/* Card 4 - Drivers on Trip */}
+          <div className="uiverse-card-rose h-full cursor-default">
+            <div className="uiverse-card-inner h-full p-6 flex items-center justify-between relative overflow-hidden group bg-gradient-to-br from-rose-500/5 to-slate-950/90">
+              <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-rose-500/10 blur-xl group-hover:bg-rose-500/20 transition-all duration-500" />
+              <div className="space-y-2 relative z-10">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Drivers on Trip</p>
+                <h3 className="text-3xl font-extrabold text-rose-400" style={{ textShadow: '0 0 10px rgba(244,63,94,0.3)' }}>{kpis.driversOnDuty}</h3>
+                <p className="text-[10px] text-slate-500">Active operators</p>
+              </div>
+              <div className="rounded-2xl bg-rose-950/40 p-4 border border-rose-850/30 text-rose-400 group-hover:border-rose-500/50 group-hover:shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all duration-300 relative z-10">
+                <Users size={24} />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Cost breakdown pie chart */}
-        <div className="glass-panel p-6 space-y-4">
-          <div>
-            <h3 className="text-sm font-bold text-slate-200">Operating Cost Center</h3>
-            <p className="text-[11px] text-slate-400">Total expense distributions across category types</p>
+        {/* Enhanced Interactive Filters Panel */}
+        <div className="glass-panel p-6 border border-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.08)]">
+          <div className="flex items-center space-x-2 mb-4">
+            <SlidersHorizontal size={16} className="text-blue-400" />
+            <h2 className="text-sm font-semibold text-slate-200">Quick Vehicle Filter Matrix</h2>
           </div>
-          <div className="h-72 w-full flex flex-col justify-between">
-            <div className="h-56 w-full">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Region</label>
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+                className="w-full rounded-xl border border-slate-800 bg-slate-950/50 px-3 py-2 text-xs text-slate-200 focus:border-blue-500 focus:shadow-[0_0_10px_rgba(59,130,246,0.2)] focus:outline-none transition-all duration-200"
+              >
+                <option value="">All Regions</option>
+                {regions.map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Vehicle Status</label>
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="w-full rounded-xl border border-slate-800 bg-slate-950/50 px-3 py-2 text-xs text-slate-200 focus:border-blue-500 focus:shadow-[0_0_10px_rgba(59,130,246,0.2)] focus:outline-none transition-all duration-200"
+              >
+                <option value="">All Statuses</option>
+                <option value="AVAILABLE">AVAILABLE</option>
+                <option value="ON_TRIP">ON TRIP</option>
+                <option value="IN_SHOP">IN SHOP</option>
+                <option value="RETIRED">RETIRED</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Body Class / Type</label>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="w-full rounded-xl border border-slate-800 bg-slate-950/50 px-3 py-2 text-xs text-slate-200 focus:border-blue-500 focus:shadow-[0_0_10px_rgba(59,130,246,0.2)] focus:outline-none transition-all duration-200"
+              >
+                <option value="">All Types</option>
+                {types.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* Live Filter Summary */}
+          <div className="mt-4 flex items-center justify-between border-t border-slate-800/60 pt-4 text-xs text-slate-400">
+            <span>Matching fleet vehicles: <strong className="text-blue-400">{filteredVehicles.length}</strong></span>
+            {(selectedRegion || selectedStatus || selectedType) && (
+              <button 
+                onClick={() => { setSelectedRegion(''); setSelectedStatus(''); setSelectedType(''); }}
+                className="text-blue-400 hover:text-blue-300 font-semibold transition-colors duration-200"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Enhanced Charts section */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Utilization trend chart */}
+          <div className="glass-panel p-6 lg:col-span-2 space-y-4 border border-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.08)]">
+            <div>
+              <h3 className="text-sm font-bold text-slate-200">Historical Fleet Utilization</h3>
+              <p className="text-[11px] text-slate-400">Average active usage percent over the past 7 days</p>
+            </div>
+            <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={costBreakdown}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={75}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {costBreakdown.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
+                <AreaChart data={utilizationData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorUtilFleet" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    </linearGradient>
+                    <filter id="glowFleet" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <XAxis dataKey="day" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} domain={[0, 100]} unit="%" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px' }}
-                    itemStyle={{ color: '#cbd5e1' }}
-                    formatter={(value) => [`$${value}`, 'Amount']}
+                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#3b82f6', borderRadius: '12px', borderWidth: 1 }}
+                    labelStyle={{ color: '#f1f5f9', fontWeight: 'bold' }}
                   />
-                </PieChart>
+                  <Area 
+                    type="monotone" 
+                    dataKey="utilizationRate" 
+                    stroke="#3b82f6" 
+                    strokeWidth={3} 
+                    fillOpacity={1} 
+                    fill="url(#colorUtilFleet)" 
+                    name="Utilization Rate"
+                    filter="url(#glowFleet)"
+                    dot={{
+                      fill: '#0f172a',
+                      stroke: '#3b82f6',
+                      strokeWidth: 2,
+                      r: 4
+                    }}
+                    activeDot={{
+                      fill: '#3b82f6',
+                      stroke: '#ffffff',
+                      strokeWidth: 1.5,
+                      r: 6
+                    }}
+                  />
+                </AreaChart>
               </ResponsiveContainer>
             </div>
-            
-            {/* Custom Pie Legend */}
-            <div className="grid grid-cols-2 gap-2 border-t border-slate-800/80 pt-3">
-              {costBreakdown.map((entry, idx) => (
-                <div key={entry.name} className="flex items-center space-x-2 text-xs">
-                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }}></div>
-                  <span className="text-slate-400 truncate">{entry.name}:</span>
-                  <span className="text-slate-200 font-semibold">${entry.value}</span>
-                </div>
-              ))}
+          </div>
+
+          {/* Cost breakdown pie chart */}
+          <div className="glass-panel p-6 space-y-4 border border-cyan-500/10 shadow-[0_0_30px_rgba(34,211,238,0.08)]">
+            <div>
+              <h3 className="text-sm font-bold text-slate-200">Operating Cost Center</h3>
+              <p className="text-[11px] text-slate-400">Total expense distributions across category types</p>
+            </div>
+            <div className="h-72 w-full flex flex-col justify-between">
+              <div className="h-56 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={costBreakdown}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={75}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {costBreakdown.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#0f172a', borderColor: '#22d3ee', borderRadius: '12px', borderWidth: 1 }}
+                      itemStyle={{ color: '#cbd5e1' }}
+                      formatter={(value) => [`$${value}`, 'Amount']}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              
+              {/* Custom Pie Legend */}
+              <div className="grid grid-cols-2 gap-2 border-t border-slate-800/80 pt-3">
+                {costBreakdown.map((entry, idx) => (
+                  <div key={entry.name} className="flex items-center space-x-2 text-xs">
+                    <div className="h-2 w-2 rounded-full shadow-[0_0_6px_currentColor]" style={{ backgroundColor: COLORS[idx % COLORS.length], color: COLORS[idx % COLORS.length] }}></div>
+                    <span className="text-slate-400 truncate">{entry.name}:</span>
+                    <span className="text-slate-200 font-semibold">${entry.value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Filtered Vehicles List */}
-      <div className="glass-panel overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-800/60 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-slate-200">Live Vehicle Fleet Status</h3>
-          <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-xs text-slate-400">Filtered: {filteredVehicles.length}</span>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/30 text-slate-400 font-bold">
-                <th className="p-4">Reg Number</th>
-                <th className="p-4">Vehicle Model</th>
-                <th className="p-4">Region</th>
-                <th className="p-4">Type</th>
-                <th className="p-4">Odometer</th>
-                <th className="p-4">Max Capacity</th>
-                <th className="p-4 text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60">
-              {filteredVehicles.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-500 font-medium">
-                    No vehicles found matching current filter matrix.
-                  </td>
+        {/* Enhanced Filtered Vehicles List */}
+        <div className="glass-panel overflow-hidden border border-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.08)]">
+          <div className="px-6 py-4 border-b border-slate-800/60 flex items-center justify-between">
+            <h3 className="text-sm font-bold text-slate-200">Live Vehicle Fleet Status</h3>
+            <span className="rounded-full bg-blue-950/40 border border-blue-500/20 px-2.5 py-0.5 text-xs text-blue-400 font-semibold">Filtered: {filteredVehicles.length}</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-separate border-spacing-y-2.5">
+              <thead>
+                <tr className="text-slate-400 font-extrabold uppercase tracking-wider text-[9px]">
+                  <th className="p-3 pl-6">Reg Number</th>
+                  <th className="p-3">Vehicle Model</th>
+                  <th className="p-3">Region</th>
+                  <th className="p-3">Type</th>
+                  <th className="p-3">Odometer</th>
+                  <th className="p-3">Max Capacity</th>
+                  <th className="p-3 pr-6 text-right">Status</th>
                 </tr>
-              ) : (
-                filteredVehicles.map(v => (
-                  <tr key={v.id} className="hover:bg-slate-900/40 transition-colors">
-                    <td className="p-4 font-mono font-bold text-slate-300">{v.registration_no}</td>
-                    <td className="p-4 font-semibold text-slate-200">{v.name}</td>
-                    <td className="p-4 text-slate-400">{v.region || '—'}</td>
-                    <td className="p-4 text-slate-400">{v.type}</td>
-                    <td className="p-4 font-mono text-slate-300">{v.odometer.toLocaleString()} km</td>
-                    <td className="p-4 font-mono text-slate-400">{(v.max_load_capacity / 1000).toFixed(1)}t</td>
-                    <td className="p-4 text-right">
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
-                        v.status === 'AVAILABLE' ? 'border-emerald-550/20 bg-emerald-950/20 text-emerald-400' :
-                        v.status === 'ON_TRIP' ? 'border-blue-500/20 bg-blue-950/20 text-blue-400' :
-                        v.status === 'IN_SHOP' ? 'border-amber-500/20 bg-amber-950/20 text-amber-400' :
-                        'border-slate-600/20 bg-slate-800/20 text-slate-400'
-                      }`}>
-                        <span className={`mr-1 h-1.5 w-1.5 rounded-full ${
-                          v.status === 'AVAILABLE' ? 'bg-emerald-400 pulse-dot' :
-                          v.status === 'ON_TRIP' ? 'bg-blue-400 pulse-dot' :
-                          v.status === 'IN_SHOP' ? 'bg-amber-400 pulse-dot' :
-                          'bg-slate-400'
-                        }`} />
-                        {v.status}
-                      </span>
+              </thead>
+              <tbody>
+                {filteredVehicles.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center">
+                      <div className="p-8 border border-dashed border-slate-800 rounded-xl bg-slate-900/10">
+                        <Activity className="mx-auto text-slate-600 mb-2" size={32} />
+                        <p className="text-xs text-slate-400 font-semibold">No vehicles found matching current filter matrix.</p>
+                      </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  filteredVehicles.map(v => (
+                    <tr 
+                      key={v.id} 
+                      className="group hover:scale-[1.005] transition-all duration-300"
+                    >
+                      <td className="p-4 pl-6 bg-slate-900/25 border-t border-b first:border-l border-slate-800/80 first:rounded-l-2xl group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                        <div className="flex items-center">
+                          <div className="w-7 h-7 rounded-xl bg-slate-950/70 border border-slate-850 flex items-center justify-center font-extrabold text-blue-400 text-[10px] mr-3 group-hover:border-blue-500/30 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.2)] transition-all duration-300 shadow-inner">
+                            {v.registration_no.slice(-3)}
+                          </div>
+                          <span className="font-extrabold text-slate-200 tracking-wide font-mono">{v.registration_no}</span>
+                        </div>
+                      </td>
+                      <td className="p-4 font-semibold text-slate-200 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                        {v.name}
+                      </td>
+                      <td className="p-4 text-slate-400 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                        {v.region || '—'}
+                      </td>
+                      <td className="p-4 text-slate-400 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                        {v.type}
+                      </td>
+                      <td className="p-4 font-mono text-slate-300 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                        {v.odometer.toLocaleString()} km
+                      </td>
+                      <td className="p-4 font-mono text-slate-400 bg-slate-900/25 border-t border-b border-slate-800/80 group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300">
+                        {(v.max_load_capacity / 1000).toFixed(1)}t
+                      </td>
+                      <td className="p-4 pr-6 bg-slate-900/25 border-t border-b last:border-r border-slate-800/80 last:rounded-r-2xl group-hover:bg-slate-800/25 group-hover:border-slate-700/60 transition-all duration-300 text-right">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-extrabold border ${
+                          v.status === 'AVAILABLE' ? 'border-emerald-500/20 bg-emerald-950/20 text-emerald-400' :
+                          v.status === 'ON_TRIP' ? 'border-blue-500/20 bg-blue-950/20 text-blue-400' :
+                          v.status === 'IN_SHOP' ? 'border-amber-500/20 bg-amber-950/20 text-amber-400' :
+                          'border-slate-600/20 bg-slate-800/20 text-slate-400'
+                        }`}>
+                          <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${
+                            v.status === 'AVAILABLE' ? 'bg-emerald-400 animate-pulse shadow-[0_0_6px_#10b981]' :
+                            v.status === 'ON_TRIP' ? 'bg-blue-400 animate-pulse shadow-[0_0_6px_#3b82f6]' :
+                            v.status === 'IN_SHOP' ? 'bg-amber-400 animate-pulse shadow-[0_0_6px_#f59e0b]' :
+                            'bg-slate-400'
+                          }`} />
+                          {v.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
         </div>
       </div>
-    </div>
-  );
+    );
 };
 
 const CustomFinancialTooltip = ({ active, payload }: any) => {

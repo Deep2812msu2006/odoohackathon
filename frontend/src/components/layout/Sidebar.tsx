@@ -24,12 +24,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
 
   const navItems = [
     { to: '/', label: 'Dashboard', icon: LayoutDashboard, roles: ['FLEET_MANAGER', 'DRIVER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
-    { to: '/vehicles', label: 'Vehicles', icon: Truck, roles: ['FLEET_MANAGER', 'DRIVER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
+    { to: '/vehicles', label: 'Vehicles', icon: Truck, roles: ['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST'] },
     { to: '/drivers', label: 'Drivers', icon: Users, roles: ['FLEET_MANAGER', 'DRIVER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
-    { to: '/trips', label: 'Trips', icon: Navigation, roles: ['FLEET_MANAGER', 'DRIVER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
-    { to: '/maintenance', label: 'Maintenance', icon: Wrench, roles: ['FLEET_MANAGER', 'DRIVER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
-    { to: '/expenses', label: 'Fuel & Expenses', icon: DollarSign, roles: ['FLEET_MANAGER', 'DRIVER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
-    { to: '/reports', label: 'Reports & ROI', icon: BarChart3, roles: ['FLEET_MANAGER', 'DRIVER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST'] },
+    { to: '/trips', label: 'Trips', icon: Navigation, roles: ['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST'] },
+    { to: '/maintenance', label: 'Maintenance', icon: Wrench, roles: ['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST'] },
+    { to: '/expenses', label: 'Fuel & Expenses', icon: DollarSign, roles: ['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST'] },
+    { to: '/reports', label: 'Reports & ROI', icon: BarChart3, roles: ['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST'] },
   ];
 
   const filteredItems = navItems.filter(item => !user || item.roles.includes(user.role));

@@ -98,9 +98,9 @@ export const verifyRegistration = async (req: Request, res: Response) => {
     await AuthToken.deleteMany({ email });
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { id: user._id.toString(), email: user.email, role: user.role },
       process.env.JWT_SECRET || 'secret',
-      { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
+      { expiresIn: '1d' } as any
     );
 
     res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
@@ -139,9 +139,9 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { id: user._id.toString(), email: user.email, role: user.role },
       process.env.JWT_SECRET || 'secret',
-      { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
+      { expiresIn: '1d' } as any
     );
 
     res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });

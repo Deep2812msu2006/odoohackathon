@@ -67,7 +67,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/vehicles" element={
-              <ProtectedRoute allowedRoles={['FLEET_MANAGER']}>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST']}>
                 <LayoutWrapper>
                   <Vehicles />
                 </LayoutWrapper>
@@ -75,7 +75,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/drivers" element={
-              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'SAFETY_OFFICER']}>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'DRIVER', 'SAFETY_OFFICER', 'FINANCIAL_ANALYST']}>
                 <LayoutWrapper>
                   <Drivers />
                 </LayoutWrapper>
@@ -83,7 +83,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/trips" element={
-              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'DRIVER']}>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST']}>
                 <LayoutWrapper>
                   <Trips />
                 </LayoutWrapper>
@@ -91,7 +91,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/maintenance" element={
-              <ProtectedRoute allowedRoles={['FLEET_MANAGER']}>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST']}>
                 <LayoutWrapper>
                   <Maintenance />
                 </LayoutWrapper>
@@ -99,7 +99,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/expenses" element={
-              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'FINANCIAL_ANALYST']}>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST']}>
                 <LayoutWrapper>
                   <FuelExpenses />
                 </LayoutWrapper>
@@ -107,7 +107,7 @@ export const App: React.FC = () => {
             } />
 
             <Route path="/reports" element={
-              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'FINANCIAL_ANALYST']}>
+              <ProtectedRoute allowedRoles={['FLEET_MANAGER', 'DRIVER', 'FINANCIAL_ANALYST']}>
                 <LayoutWrapper>
                   <Reports />
                 </LayoutWrapper>

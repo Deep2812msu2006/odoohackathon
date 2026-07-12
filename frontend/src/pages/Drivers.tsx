@@ -23,6 +23,23 @@ type DriverFormValues = z.infer<typeof driverSchema>;
 export const Drivers: React.FC = () => {
   const { user } = useAuth();
   const [drivers, setDrivers] = useState<Driver[]>([]);
+
+  const starShadows = React.useMemo(() => {
+    const generateStarShadows = (count: number) => {
+      const shadows = [];
+      for (let i = 0; i < count; i++) {
+        const x = Math.floor(Math.random() * 2000);
+        const y = Math.floor(Math.random() * 2000);
+        shadows.push(`${x}px ${y}px #ffffff`);
+      }
+      return shadows.join(', ');
+    };
+    return {
+      slow: generateStarShadows(150),
+      medium: generateStarShadows(100),
+      fast: generateStarShadows(50),
+    };
+  }, []);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
@@ -144,7 +161,16 @@ export const Drivers: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="relative -m-6 md:-m-8 p-6 md:p-8 space-y-6 overflow-hidden rounded-2xl min-h-[calc(100vh-4rem)]" style={{
+      background: 'radial-gradient(ellipse at bottom, #2b1836 0%, #060a0d 100%)',
+    }}>
+      {/* Parallax Stars Layers */}
+      <div className="safety-stars-layer animate-stars-slow" style={{ width: '1px', height: '1px', boxShadow: starShadows.slow }} />
+      <div className="safety-stars-layer animate-stars-medium" style={{ width: '2px', height: '2px', boxShadow: starShadows.medium }} />
+      <div className="safety-stars-layer animate-stars-fast" style={{ width: '3px', height: '3px', boxShadow: starShadows.fast }} />
+
+      {/* Content Wrapper to render on top of stars */}
+      <div className="relative z-10 space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-100">Driver Directory</h1>
@@ -267,19 +293,19 @@ export const Drivers: React.FC = () => {
                           </div>
                         </td>
                         <td className="p-4">
-                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
-                            d.status === 'AVAILABLE' ? 'border-emerald-500/20 bg-emerald-950/20 text-emerald-400' :
-                            d.status === 'ON_TRIP' ? 'border-blue-500/20 bg-blue-950/20 text-blue-400' :
-                            d.status === 'OFF_DUTY' ? 'border-slate-700/20 bg-slate-800/20 text-slate-400' :
-                            'border-red-500/20 bg-red-950/20 text-red-400'
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-extrabold border ${
+                            d.status === 'AVAILABLE' ? 'border-emerald-500/30 bg-emerald-950/35 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.12)]' :
+                            d.status === 'ON_TRIP' ? 'border-blue-550/30 bg-blue-950/35 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.12)]' :
+                            d.status === 'OFF_DUTY' ? 'border-slate-800 bg-slate-900/35 text-slate-400' :
+                            'border-red-500/30 bg-red-950/35 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.12)]'
                           }`}>
-                            <span className={`mr-1 h-1.5 w-1.5 rounded-full ${
-                              d.status === 'AVAILABLE' ? 'bg-emerald-400 pulse-dot' :
-                              d.status === 'ON_TRIP' ? 'bg-blue-400 pulse-dot' :
-                              d.status === 'OFF_DUTY' ? 'bg-slate-400' :
-                              'bg-red-400 pulse-dot'
+                            <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${
+                              d.status === 'AVAILABLE' ? 'bg-emerald-400 animate-pulse' :
+                              d.status === 'ON_TRIP' ? 'bg-blue-400 animate-pulse' :
+                              d.status === 'OFF_DUTY' ? 'bg-slate-500' :
+                              'bg-red-400 shadow-[0_0_4px_#ef4444]'
                             }`} />
-                            {d.status}
+                            {d.status === 'ON_TRIP' ? 'ON DUTY' : d.status}
                           </span>
                         </td>
                         {isSafetyOfficer && (
@@ -314,17 +340,17 @@ export const Drivers: React.FC = () => {
 
       {/* Add / Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl space-y-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 px-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-md p-6 shadow-[0_0_50px_rgba(139,92,246,0.15)] space-y-6">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-slate-200"
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-200 transition-colors"
             >
               <X size={16} />
             </button>
 
             <div>
-              <h3 className="text-base font-bold text-slate-100">
+              <h3 className="text-base font-extrabold text-slate-100 tracking-wide">
                 {editingDriver ? 'Edit Operator Credentials' : 'Enroll New Operator'}
               </h3>
               <p className="text-[11px] text-slate-400">Fill driver qualifications and licensing records</p>
@@ -340,45 +366,45 @@ export const Drivers: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-400">Full Name</label>
+                  <label className="font-extrabold uppercase tracking-wider text-[10px] text-slate-400">Full Name</label>
                   <input
                     type="text"
                     {...register('name')}
                     placeholder="e.g. John Doe"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950/50 px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:border-orange-500 focus:shadow-[0_0_10px_rgba(249,115,22,0.2)] focus:outline-none transition-all duration-200"
                   />
-                  {errors.name && <p className="text-[10px] text-red-400">{errors.name.message}</p>}
+                  {errors.name && <p className="text-[10px] text-red-450 text-red-400">{errors.name.message}</p>}
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-400">Contact Number</label>
+                  <label className="font-extrabold uppercase tracking-wider text-[10px] text-slate-400">Contact Number</label>
                   <input
                     type="text"
                     {...register('contact_number')}
                     placeholder="e.g. +1 (555) 019-3829"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950/50 px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:border-orange-500 focus:shadow-[0_0_10px_rgba(249,115,22,0.2)] focus:outline-none transition-all duration-200"
                   />
-                  {errors.contact_number && <p className="text-[10px] text-red-400">{errors.contact_number.message}</p>}
+                  {errors.contact_number && <p className="text-[10px] text-red-455 text-red-400">{errors.contact_number.message}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-400">License ID Number</label>
+                  <label className="font-extrabold uppercase tracking-wider text-[10px] text-slate-400">License ID Number</label>
                   <input
                     type="text"
                     {...register('license_number')}
                     placeholder="e.g. DL-88912-A"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950/50 px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:border-orange-500 focus:shadow-[0_0_10px_rgba(249,115,22,0.2)] focus:outline-none transition-all duration-200"
                   />
-                  {errors.license_number && <p className="text-[10px] text-red-400">{errors.license_number.message}</p>}
+                  {errors.license_number && <p className="text-[10px] text-red-450 text-red-400">{errors.license_number.message}</p>}
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-400">License Category</label>
+                  <label className="font-extrabold uppercase tracking-wider text-[10px] text-slate-400">License Category</label>
                   <select
                     {...register('license_category')}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950/80 px-3.5 py-2.5 text-xs text-slate-200 focus:border-orange-500 focus:outline-none transition-colors duration-200"
                   >
                     <option value="Class A CDL">Class A CDL</option>
                     <option value="Class B CDL">Class B CDL</option>
@@ -389,32 +415,32 @@ export const Drivers: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-400">License Expiry (YYYY-MM-DD)</label>
+                  <label className="font-extrabold uppercase tracking-wider text-[10px] text-slate-400">License Expiry (YYYY-MM-DD)</label>
                   <input
                     type="text"
                     {...register('license_expiry_date')}
                     placeholder="2028-12-31"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950/50 px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:border-orange-500 focus:shadow-[0_0_10px_rgba(249,115,22,0.2)] focus:outline-none transition-all duration-200"
                   />
-                  {errors.license_expiry_date && <p className="text-[10px] text-red-400">{errors.license_expiry_date.message}</p>}
+                  {errors.license_expiry_date && <p className="text-[10px] text-red-450 text-red-400">{errors.license_expiry_date.message}</p>}
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-400">Safety Rating Score (0-100)</label>
+                  <label className="font-extrabold uppercase tracking-wider text-[10px] text-slate-400">Safety Rating Score (0-100)</label>
                   <input
                     type="number"
                     {...register('safety_score', { valueAsNumber: true })}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950/50 px-3.5 py-2.5 text-xs text-slate-200 focus:border-orange-500 focus:shadow-[0_0_10px_rgba(249,115,22,0.2)] focus:outline-none transition-all duration-200"
                   />
-                  {errors.safety_score && <p className="text-[10px] text-red-400">{errors.safety_score.message}</p>}
+                  {errors.safety_score && <p className="text-[10px] text-red-450 text-red-400">{errors.safety_score.message}</p>}
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-400">Duty / Safety Status</label>
+                <label className="font-extrabold uppercase tracking-wider text-[10px] text-slate-400">Duty / Safety Status</label>
                 <select
                   {...register('status')}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-slate-200 focus:outline-none focus:border-orange-500"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/80 px-3.5 py-2.5 text-xs text-slate-200 focus:border-orange-500 focus:outline-none transition-colors duration-200"
                 >
                   <option value="AVAILABLE">AVAILABLE</option>
                   <option value="ON_TRIP">ON TRIP</option>
@@ -423,17 +449,17 @@ export const Drivers: React.FC = () => {
                 </select>
               </div>
 
-              <div className="flex justify-end space-x-2 pt-4 border-t border-slate-800">
+              <div className="flex justify-end space-x-2.5 pt-4 border-t border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="btn-secondary-custom"
+                  className="px-4 py-2.5 text-xs font-bold rounded-xl border border-slate-700 bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-600 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2.5 btn-gradient"
+                  className="px-4 py-2.5 text-xs font-bold text-white btn-gradient shadow-[0_0_15px_rgba(249,115,22,0.2)] hover:shadow-[0_0_20px_rgba(249,115,22,0.3)] active:scale-95 transition-all duration-200"
                 >
                   Save Profile
                 </button>
@@ -442,6 +468,7 @@ export const Drivers: React.FC = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

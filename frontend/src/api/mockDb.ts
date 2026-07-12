@@ -36,6 +36,7 @@ export interface Driver {
   safety_score: number;
   status: DriverStatus;
   created_at: string;
+  notes?: string;
 }
 
 export interface Trip {
@@ -108,8 +109,8 @@ const initialVehicles: Vehicle[] = [
 const initialDrivers: Driver[] = [
   { id: 'd1', name: 'Dave Driver', license_number: 'DL-992819-01', license_category: 'Class A CDL', license_expiry_date: '2028-12-15', contact_number: '+1 (555) 019-2831', safety_score: 95, status: 'ON_TRIP', created_at: new Date().toISOString() },
   { id: 'd2', name: 'Bob Baker', license_number: 'DL-881920-02', license_category: 'Class A CDL', license_expiry_date: '2027-05-10', contact_number: '+1 (555) 018-4729', safety_score: 98, status: 'AVAILABLE', created_at: new Date().toISOString() },
-  { id: 'd3', name: 'Charlie Cox (Expired)', license_number: 'DL-772918-03', license_category: 'Class B CDL', license_expiry_date: '2026-07-01', contact_number: '+1 (555) 017-9812', safety_score: 84, status: 'AVAILABLE', created_at: new Date().toISOString() },
-  { id: 'd4', name: 'Steve Stone (Suspended)', license_number: 'DL-552918-04', license_category: 'Class A CDL', license_expiry_date: '2029-01-20', contact_number: '+1 (555) 015-3819', safety_score: 55, status: 'SUSPENDED', created_at: new Date().toISOString() },
+  { id: 'd3', name: 'Charlie Cox', license_number: 'DL-772918-03', license_category: 'Class B CDL', license_expiry_date: '2026-07-01', contact_number: '+1 (555) 017-9812', safety_score: 84, status: 'AVAILABLE', created_at: new Date().toISOString() },
+  { id: 'd4', name: 'Steve Stone', license_number: 'DL-552918-04', license_category: 'Class A CDL', license_expiry_date: '2029-01-20', contact_number: '+1 (555) 015-3819', safety_score: 55, status: 'SUSPENDED', created_at: new Date().toISOString() },
   { id: 'd5', name: 'Alice Adams', license_number: 'DL-661298-05', license_category: 'Class A CDL', license_expiry_date: '2026-08-05', contact_number: '+1 (555) 016-4822', safety_score: 90, status: 'AVAILABLE', created_at: new Date().toISOString() } // Expiry in < 30 days
 ];
 
@@ -148,6 +149,31 @@ const initializeDB = () => {
 };
 
 initializeDB();
+
+// Clean existing localStorage driver name markers if present from previous sessions
+try {
+  const storedDrivers = localStorage.getItem('to_drivers');
+  if (storedDrivers) {
+    const parsed = JSON.parse(storedDrivers);
+    let updated = false;
+    const cleaned = parsed.map((d: any) => {
+      if (d.name.includes(' (Expired)')) {
+        d.name = d.name.replace(' (Expired)', '');
+        updated = true;
+      }
+      if (d.name.includes(' (Suspended)')) {
+        d.name = d.name.replace(' (Suspended)', '');
+        updated = true;
+      }
+      return d;
+    });
+    if (updated) {
+      localStorage.setItem('to_drivers', JSON.stringify(cleaned));
+    }
+  }
+} catch (e) {
+  console.error('Error cleaning up local storage driver names', e);
+}
 
 // DB Access Methods simulating atomic queries and business rules
 export const db = {

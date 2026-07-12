@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import type { Trip, Vehicle, Driver, TripStatus } from '../api/mockDb';
 import { 
   Plus, Play, CheckCircle2, XCircle, Milestone, 
-  AlertTriangle, Navigation, Info, Fuel, X 
+  AlertTriangle, Navigation, Info, Fuel, X, MapPin, Route 
 } from 'lucide-react';
 
 const tripSchema = z.object({
@@ -46,6 +46,12 @@ export const Trips: React.FC = () => {
   const [actualDistance, setActualDistance] = useState('');
   const [fuelConsumed, setFuelConsumed] = useState('');
   const [completeError, setCompleteError] = useState('');
+
+  // Map state
+  const [mapZoom, setMapZoom] = useState(1);
+  const [mapPan, setMapPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   // Selected vehicle for weight check in modal
   const canMutate = user?.role === 'DRIVER' || user?.role === 'FLEET_MANAGER';
@@ -193,6 +199,29 @@ export const Trips: React.FC = () => {
   };
 
   const filteredTrips = trips.filter(t => activeTab === 'ALL' || t.status === activeTab);
+
+  // Map handlers
+  const handleZoomIn = () => setMapZoom(prev => Math.min(prev + 0.2, 3));
+  const handleZoomOut = () => setMapZoom(prev => Math.max(prev - 0.2, 0.5));
+  const handleResetView = () => {
+    setMapZoom(1);
+    setMapPan({ x: 0, y: 0 });
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - mapPan.x, y: e.clientY - mapPan.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setMapPan({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
+    });
+  };
+
+  const handleMouseUp = () => setIsDragging(false);
 
   const getVehicleName = (id: string) => vehicles.find(v => v.id === id)?.name || 'Unknown Vehicle';
   const getVehicleReg = (id: string) => vehicles.find(v => v.id === id)?.registration_no || '';
@@ -354,6 +383,200 @@ export const Trips: React.FC = () => {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Interactive Route Map */}
+      <div className="glass-panel p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Route className="text-orange-500" size={20} />
+            <h3 className="text-sm font-bold text-slate-200">Live Route Visualization</h3>
+          </div>
+          <div className="flex items-center space-x-4 text-[10px]">
+            <div className="flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+              <span className="text-slate-400">Active</span>
+            </div>
+            <div className="flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span className="text-slate-400">Completed</span>
+            </div>
+            <div className="flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-slate-500"></span>
+              <span className="text-slate-400">Draft</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative h-[500px] rounded-xl overflow-hidden bg-slate-900/50 border border-slate-800">
+          {/* Map Background Grid */}
+          <div className="absolute inset-0 opacity-20" style={{
+            backgroundImage: `
+              linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px'
+          }}></div>
+
+          {/* Zoom Controls */}
+          <div className="absolute top-4 right-4 z-20 flex flex-col space-y-2">
+            <button
+              onClick={handleZoomIn}
+              className="w-8 h-8 rounded-lg bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center"
+              title="Zoom In"
+            >
+              <span className="text-lg font-bold">+</span>
+            </button>
+            <button
+              onClick={handleZoomOut}
+              className="w-8 h-8 rounded-lg bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center"
+              title="Zoom Out"
+            >
+              <span className="text-lg font-bold">−</span>
+            </button>
+            <button
+              onClick={handleResetView}
+              className="w-8 h-8 rounded-lg bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center"
+              title="Reset View"
+            >
+              <span className="text-xs font-bold">⟲</span>
+            </button>
+          </div>
+
+          {/* Zoom Level Indicator */}
+          <div className="absolute top-4 left-4 z-20 bg-slate-800/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-slate-700">
+            <span className="text-[10px] text-slate-400">Zoom: {Math.round(mapZoom * 100)}%</span>
+          </div>
+
+          {/* Map Container with Pan and Zoom */}
+          <div
+            className="relative w-full h-full overflow-hidden cursor-grab active:cursor-grabbing"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+          >
+            <div
+              className="absolute inset-0 transition-transform duration-75 ease-out"
+              style={{
+                transform: `translate(${mapPan.x}px, ${mapPan.y}px) scale(${mapZoom})`,
+                transformOrigin: 'center center',
+                width: '100%',
+                height: '100%'
+              }}
+            >
+              {/* Route Lines */}
+              <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
+                {filteredTrips.slice(0, 12).map((trip, index) => {
+                  const startX = 10 + (index % 4) * 20;
+                  const startY = 15 + Math.floor(index / 4) * 25;
+                  const endX = startX + 35 + (index % 3) * 10;
+                  const endY = startY + (index % 2 === 0 ? 25 : -15);
+                  
+                  const color = trip.status === 'DISPATCHED' ? '#f97316' :
+                               trip.status === 'COMPLETED' ? '#10b981' : '#64748b';
+                  
+                  return (
+                    <g key={trip.id}>
+                      <line
+                        x1={`${startX}%`}
+                        y1={`${startY}%`}
+                        x2={`${endX}%`}
+                        y2={`${endY}%`}
+                        stroke={color}
+                        strokeWidth="2"
+                        strokeDasharray={trip.status === 'DRAFT' ? '5,5' : '0'}
+                        className={trip.status === 'DISPATCHED' ? 'animate-pulse' : ''}
+                        style={{ opacity: 0.6 }}
+                      />
+                      <circle
+                        cx={`${startX}%`}
+                        cy={`${startY}%`}
+                        r="4"
+                        fill={color}
+                        className={trip.status === 'DISPATCHED' ? 'animate-pulse' : ''}
+                      />
+                      <circle
+                        cx={`${endX}%`}
+                        cy={`${endY}%`}
+                        r="4"
+                        fill={color}
+                        className={trip.status === 'DISPATCHED' ? 'animate-pulse' : ''}
+                      />
+                    </g>
+                  );
+                })}
+              </svg>
+
+              {/* Location Markers */}
+              <div className="absolute inset-0" style={{ zIndex: 2 }}>
+                {filteredTrips.slice(0, 12).map((trip, index) => {
+                  const startX = 10 + (index % 4) * 20;
+                  const startY = 15 + Math.floor(index / 4) * 25;
+                  const endX = startX + 35 + (index % 3) * 10;
+                  const endY = startY + (index % 2 === 0 ? 25 : -15);
+                  
+                  const color = trip.status === 'DISPATCHED' ? '#f97316' :
+                               trip.status === 'COMPLETED' ? '#10b981' : '#64748b';
+                  
+                  return (
+                    <React.Fragment key={trip.id}>
+                      {/* Origin Marker */}
+                      <div
+                        className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
+                        style={{ left: `${startX}%`, top: `${startY}%` }}
+                      >
+                        <div className="relative">
+                          <MapPin 
+                            size={18} 
+                            className={trip.status === 'DISPATCHED' ? 'text-orange-500 animate-bounce' : 'text-slate-400'} 
+                          />
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-[10px] text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                            {trip.source}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Destination Marker */}
+                      <div
+                        className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
+                        style={{ left: `${endX}%`, top: `${endY}%` }}
+                      >
+                        <div className="relative">
+                          <MapPin 
+                            size={18} 
+                            className={trip.status === 'COMPLETED' ? 'text-emerald-500' : 'text-slate-400'} 
+                          />
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-[10px] text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                            {trip.destination}
+                          </div>
+                        </div>
+                      </div>
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Map Legend */}
+            <div className="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-sm rounded-lg px-4 py-3 border border-slate-700 z-20">
+              <div className="text-[10px] text-slate-400 space-y-2">
+                <div className="flex items-center space-x-2">
+                  <MapPin size={12} className="text-orange-500" />
+                  <span>Active Routes: {filteredTrips.filter(t => t.status === 'DISPATCHED').length}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <MapPin size={12} className="text-emerald-500" />
+                  <span>Completed: {filteredTrips.filter(t => t.status === 'COMPLETED').length}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <MapPin size={12} className="text-slate-500" />
+                  <span>Draft: {filteredTrips.filter(t => t.status === 'DRAFT').length}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Create Modal */}

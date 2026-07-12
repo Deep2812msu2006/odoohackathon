@@ -8,7 +8,12 @@ const delay = (ms: number = 300) => new Promise(resolve => setTimeout(resolve, m
 // Retrieve user from sessionStorage to simulate Auth
 const getAuthUser = (): User | null => {
   const userStr = sessionStorage.getItem('to_auth_user');
-  return userStr ? JSON.parse(userStr) : null;
+  if (!userStr) return null;
+  const user = JSON.parse(userStr);
+  if (user && user.role) {
+    user.role = user.role.replace(' ', '_');
+  }
+  return user;
 };
 
 // Check if user has permission
@@ -22,46 +27,50 @@ const checkRole = (allowedRoles: Role[]) => {
 
 export const apiClient = {
   auth: {
-    login: async (email: string, password_hash: string) => {
-      await delay(500);
-      const users = db.getUsers();
-      const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-      
-      // Simple mock check
-      if (!user || password_hash === '') {
-        throw { response: { status: 400, data: { message: 'Invalid email or password' } } };
+    login: async (email: string, password_hash: string, role: string) => {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: password_hash, role })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw { response: { status: response.status, data } };
       }
-      
-      // Store in session storage
-      sessionStorage.setItem('to_auth_user', JSON.stringify(user));
-      sessionStorage.setItem('to_token', 'mock-jwt-token-' + user.id);
-      return { data: { user, token: 'mock-jwt-token-' + user.id } };
+      sessionStorage.setItem('to_auth_user', JSON.stringify(data.user));
+      sessionStorage.setItem('to_token', data.token);
+      return { data };
     },
     
-    register: async (name: string, email: string, role: Role) => {
-      await delay(500);
-      const users = db.getUsers();
-      const exists = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (exists) {
-        throw { response: { status: 409, data: { message: 'Email already registered' } } };
+    register: async (name: string, email: string, password_hash: string, confirm_password: string, role: string) => {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password: password_hash, confirmPassword: confirm_password, role })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw { response: { status: response.status, data } };
       }
-      
-      const newUser: User = {
-        id: 'u-' + Math.random().toString(36).substr(2, 9),
-        name,
-        email,
-        role,
-        createdAt: new Date().toISOString()
-      };
-      
-      users.push(newUser);
-      localStorage.setItem('to_users', JSON.stringify(users));
-      
-      return { data: newUser };
+      return { data };
+    },
+
+    verifyRegistration: async (email: string, otp: string) => {
+      const response = await fetch('http://localhost:5000/api/auth/verify-registration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw { response: { status: response.status, data } };
+      }
+      sessionStorage.setItem('to_auth_user', JSON.stringify(data.user));
+      sessionStorage.setItem('to_token', data.token);
+      return { data };
     },
 
     me: async () => {
-      await delay(100);
       const user = getAuthUser();
       if (!user) {
         throw { response: { status: 401, data: { message: 'Not authenticated' } } };
@@ -70,7 +79,6 @@ export const apiClient = {
     },
 
     logout: async () => {
-      await delay(100);
       sessionStorage.removeItem('to_auth_user');
       sessionStorage.removeItem('to_token');
       return { data: { success: true } };
@@ -79,18 +87,27 @@ export const apiClient = {
 
   vehicles: {
     list: async (filters?: { status?: string; type?: string; region?: string }) => {
-      await delay(300);
-      let list = db.getVehicles();
-      if (filters?.status) {
-        list = list.filter(v => v.status === filters.status);
+      try {
+        const response = await fetch('http://localhost:5000/api/vehicles');
+        let list = await response.json();
+        
+        // Map _id to id for the frontend
+        list = list.map((v: any) => ({ ...v, id: v._id }));
+
+        if (filters?.status) {
+          list = list.filter((v: any) => v.status === filters.status);
+        }
+        if (filters?.type) {
+          list = list.filter((v: any) => v.type.toLowerCase().includes(filters.type!.toLowerCase()));
+        }
+        if (filters?.region) {
+          list = list.filter((v: any) => v.region?.toLowerCase() === filters.region!.toLowerCase());
+        }
+        return { data: list };
+      } catch (e) {
+        console.error('Failed to fetch from backend, falling back to mock data', e);
+        return { data: [] };
       }
-      if (filters?.type) {
-        list = list.filter(v => v.type.toLowerCase().includes(filters.type!.toLowerCase()));
-      }
-      if (filters?.region) {
-        list = list.filter(v => v.region?.toLowerCase() === filters.region!.toLowerCase());
-      }
-      return { data: list };
     },
 
     getAvailable: async () => {
@@ -106,54 +123,63 @@ export const apiClient = {
     },
 
     create: async (vehicleData: Omit<Vehicle, 'id' | 'created_at'>) => {
-      await delay(300);
-      checkRole(['FLEET_MANAGER']); // Only Fleet Manager can create
       try {
-        const saved = db.saveVehicle(vehicleData);
+        const response = await fetch('http://localhost:5000/api/vehicles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(vehicleData)
+        });
+        if (!response.ok) throw new Error('Failed to create vehicle');
+        let saved = await response.json();
+        saved = { ...saved, id: saved._id };
         return { data: saved };
       } catch (err: any) {
-        if (err.message === 'VEHICLE_REGISTRATION_EXISTS') {
-          throw { response: { status: 409, data: { message: 'Vehicle registration number already exists.' } } };
-        }
         throw { response: { status: 400, data: { message: err.message } } };
       }
     },
 
     update: async (id: string, vehicleData: Partial<Vehicle>) => {
-      await delay(300);
-      checkRole(['FLEET_MANAGER']); // Only Fleet Manager can edit
       try {
-        const vehicles = db.getVehicles();
-        const existing = vehicles.find(v => v.id === id);
-        if (!existing) throw { response: { status: 404, data: { message: 'Vehicle not found' } } };
-        
-        const merged = { ...existing, ...vehicleData } as Vehicle;
-        const saved = db.saveVehicle(merged);
+        const response = await fetch(`http://localhost:5000/api/vehicles/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(vehicleData)
+        });
+        if (!response.ok) throw new Error('Failed to update vehicle');
+        let saved = await response.json();
+        saved = { ...saved, id: saved._id };
         return { data: saved };
       } catch (err: any) {
-        if (err.message === 'VEHICLE_REGISTRATION_EXISTS') {
-          throw { response: { status: 409, data: { message: 'Vehicle registration number already exists.' } } };
-        }
         throw { response: { status: 400, data: { message: err.message } } };
       }
     },
 
     delete: async (id: string) => {
-      await delay(300);
-      checkRole(['FLEET_MANAGER']); // Only Fleet Manager can delete
-      db.deleteVehicle(id);
-      return { data: { success: true } };
+      try {
+        const response = await fetch(`http://localhost:5000/api/vehicles/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Failed to delete vehicle');
+        return { data: { success: true } };
+      } catch (err: any) {
+        throw { response: { status: 400, data: { message: err.message } } };
+      }
     }
   },
 
   drivers: {
     list: async (filters?: { status?: string }) => {
-      await delay(300);
-      let list = db.getDrivers();
-      if (filters?.status) {
-        list = list.filter(d => d.status === filters.status);
+      try {
+        const response = await fetch('http://localhost:5000/api/drivers');
+        let list = await response.json();
+        list = list.map((d: any) => ({ ...d, id: d._id }));
+
+        if (filters?.status) {
+          list = list.filter((d: any) => d.status === filters.status);
+        }
+        return { data: list };
+      } catch (e) {
+        console.error('Failed to fetch from backend, falling back to mock data', e);
+        return { data: [] };
       }
-      return { data: list };
     },
 
     getAvailable: async () => {
@@ -169,72 +195,90 @@ export const apiClient = {
     },
 
     create: async (driverData: Omit<Driver, 'id' | 'created_at'>) => {
-      await delay(300);
-      checkRole(['SAFETY_OFFICER']); // Only Safety Officer can CRUD drivers
       try {
-        const saved = db.saveDriver(driverData);
+        const response = await fetch('http://localhost:5000/api/drivers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(driverData)
+        });
+        if (!response.ok) throw new Error('Failed to create driver');
+        let saved = await response.json();
+        saved = { ...saved, id: saved._id };
         return { data: saved };
       } catch (err: any) {
-        if (err.message === 'DRIVER_LICENSE_EXISTS') {
-          throw { response: { status: 409, data: { message: 'Driver license number already exists.' } } };
-        }
         throw { response: { status: 400, data: { message: err.message } } };
       }
     },
 
     update: async (id: string, driverData: Partial<Driver>) => {
-      await delay(300);
-      checkRole(['SAFETY_OFFICER']);
       try {
-        const drivers = db.getDrivers();
-        const existing = drivers.find(d => d.id === id);
-        if (!existing) throw { response: { status: 404, data: { message: 'Driver not found' } } };
-
-        const merged = { ...existing, ...driverData } as Driver;
-        const saved = db.saveDriver(merged);
+        const response = await fetch(`http://localhost:5000/api/drivers/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(driverData)
+        });
+        if (!response.ok) throw new Error('Failed to update driver');
+        let saved = await response.json();
+        saved = { ...saved, id: saved._id };
         return { data: saved };
       } catch (err: any) {
-        if (err.message === 'DRIVER_LICENSE_EXISTS') {
-          throw { response: { status: 409, data: { message: 'Driver license number already exists.' } } };
-        }
         throw { response: { status: 400, data: { message: err.message } } };
       }
     },
 
     delete: async (id: string) => {
-      await delay(300);
-      checkRole(['SAFETY_OFFICER']);
-      db.deleteDriver(id);
-      return { data: { success: true } };
+      try {
+        const response = await fetch(`http://localhost:5000/api/drivers/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Failed to delete driver');
+        return { data: { success: true } };
+      } catch (err: any) {
+        throw { response: { status: 400, data: { message: err.message } } };
+      }
     }
   },
 
   trips: {
     list: async (filters?: { status?: string }) => {
-      await delay(300);
-      let list = db.getTrips();
-      if (filters?.status) {
-        list = list.filter(t => t.status === filters.status);
-      }
-      
-      // Role enforcement check: Drivers can only view their own trips (or all if we want to filter, but user requested: "view own trips")
-      const user = getAuthUser();
-      if (user && user.role === 'DRIVER') {
-        const driver = db.getDrivers().find(d => d.name === user.name); // match driver by name or mock relationship
-        if (driver) {
-          list = list.filter(t => t.driver_id === driver.id);
+      try {
+        const response = await fetch('http://localhost:5000/api/trips');
+        let list = await response.json();
+        list = list.map((t: any) => ({ ...t, id: t._id }));
+        
+        if (filters?.status) {
+          list = list.filter((t: any) => t.status === filters.status);
         }
+        
+        // Filter by driver if user is a Driver
+        const user = getAuthUser();
+        if (user && user.role === 'DRIVER') {
+          // Attempting to match driver. Normally we'd do this via real Driver ID linked to user.
+          // For now, if driver name matches user name.
+          try {
+             const drRes = await fetch('http://localhost:5000/api/drivers');
+             const drivers = await drRes.json();
+             const myDriver = drivers.find((d: any) => d.name === user.name);
+             if (myDriver) {
+               list = list.filter((t: any) => t.driver_id === myDriver._id);
+             }
+          } catch (e) {}
+        }
+        return { data: list };
+      } catch (e) {
+        return { data: [] };
       }
-      
-      return { data: list };
     },
 
     create: async (tripData: Omit<Trip, 'id' | 'status' | 'created_at'>) => {
-      await delay(300);
-      // Fleet Managers and Drivers can create trips (Drivers can create trips, and managers can view them/etc)
       checkRole(['FLEET_MANAGER', 'DRIVER']);
       try {
-        const saved = db.createTrip(tripData);
+        const response = await fetch('http://localhost:5000/api/trips', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(tripData)
+        });
+        if (!response.ok) throw new Error('Failed to create trip');
+        let saved = await response.json();
+        saved = { ...saved, id: saved._id };
         return { data: saved };
       } catch (err: any) {
         throw { response: { status: 400, data: { message: err.message } } };
@@ -242,33 +286,55 @@ export const apiClient = {
     },
 
     dispatch: async (id: string) => {
-      await delay(300);
-      checkRole(['DRIVER']); // Rule permissions: "Driver: create/dispatch/complete/cancel Trips"
+      checkRole(['DRIVER']);
       try {
-        const updated = db.dispatchTrip(id);
-        return { data: updated };
+        const response = await fetch(`http://localhost:5000/api/trips/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'DISPATCHED' })
+        });
+        if (!response.ok) throw new Error('Failed to dispatch trip');
+        let saved = await response.json();
+        saved = { ...saved, id: saved._id };
+        return { data: saved };
       } catch (err: any) {
         throw { response: { status: 400, data: { message: err.message } } };
       }
     },
 
     complete: async (id: string, body: { finalOdometer: number; fuelConsumed: number }) => {
-      await delay(300);
       checkRole(['DRIVER']);
       try {
-        const updated = db.completeTrip(id, body.finalOdometer, body.fuelConsumed);
-        return { data: updated };
+        const response = await fetch(`http://localhost:5000/api/trips/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            status: 'COMPLETED',
+            actual_distance: body.finalOdometer,
+            fuel_consumed: body.fuelConsumed
+          })
+        });
+        if (!response.ok) throw new Error('Failed to complete trip');
+        let saved = await response.json();
+        saved = { ...saved, id: saved._id };
+        return { data: saved };
       } catch (err: any) {
         throw { response: { status: 400, data: { message: err.message } } };
       }
     },
 
     cancel: async (id: string) => {
-      await delay(300);
       checkRole(['DRIVER']);
       try {
-        const updated = db.cancelTrip(id);
-        return { data: updated };
+        const response = await fetch(`http://localhost:5000/api/trips/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'CANCELLED' })
+        });
+        if (!response.ok) throw new Error('Failed to cancel trip');
+        let saved = await response.json();
+        saved = { ...saved, id: saved._id };
+        return { data: saved };
       } catch (err: any) {
         throw { response: { status: 400, data: { message: err.message } } };
       }

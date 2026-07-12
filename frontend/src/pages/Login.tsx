@@ -9,6 +9,7 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('FLEET MANAGER');
   const [error, setError] = useState('');
 
   const starShadows = useMemo(() => {
@@ -32,20 +33,20 @@ export const Login: React.FC = () => {
     e.preventDefault();
     setError('');
     try {
-      await login(email, password);
+      await login(email, password, role);
       navigate('/');
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Login failed. Try again.');
+      setError(err?.response?.data?.error || 'Login failed. Try again.');
     }
   };
 
-  const handleQuickLogin = async (roleEmail: string) => {
+  const handleQuickLogin = async (roleEmail: string, roleName: string) => {
     setError('');
     try {
-      await login(roleEmail, 'password123');
+      await login(roleEmail, 'password123', roleName.toUpperCase().replace(' ', '_'));
       navigate('/');
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Quick login failed.');
+      setError(err?.response?.data?.error || 'Quick login failed.');
     }
   };
 
@@ -118,6 +119,23 @@ export const Login: React.FC = () => {
               />
             </div>
 
+            <div className="space-y-2">
+              <label htmlFor="role" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Select Role
+              </label>
+              <select
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-3 text-sm text-slate-100 focus:border-orange-500 focus:shadow-[0_0_10px_rgba(249,115,22,0.2)] focus:outline-none transition-all duration-200"
+              >
+                <option value="FLEET MANAGER">Fleet Manager</option>
+                <option value="DRIVER">Driver</option>
+                <option value="SAFETY OFFICER">Safety Officer</option>
+                <option value="FINANCIAL ANALYST">Financial Analyst</option>
+              </select>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
@@ -129,36 +147,18 @@ export const Login: React.FC = () => {
                 'Sign In'
               )}
             </button>
+
+            <div className="text-center text-sm text-slate-400 mt-4">
+              Don't have an account?{' '}
+              <button 
+                type="button"
+                onClick={() => navigate('/register')}
+                className="text-orange-400 hover:text-orange-300 font-semibold"
+              >
+                Sign Up
+              </button>
+            </div>
           </form>
-
-          {/* Quick Access Grid */}
-          <div className="mt-8">
-            <div className="relative flex items-center justify-center my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-800"></div>
-              </div>
-              <span className="relative bg-[#0d121c] px-3 text-xs font-bold uppercase tracking-widest text-slate-500">
-                Demo Quick Roles
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {roleLogins.map((role) => {
-                const Icon = role.icon;
-                return (
-                  <button
-                    key={role.email}
-                    onClick={() => handleQuickLogin(role.email)}
-                    className={`flex flex-col items-center justify-center rounded-2xl border p-4 text-center hover:scale-[1.02] active:scale-[0.98] cursor-pointer transition-all duration-200 ${role.color}`}
-                  >
-                    <Icon className="h-6 w-6 mb-2" />
-                    <span className="text-xs font-bold">{role.label}</span>
-                    <span className="text-[10px] opacity-70 mt-0.5">{role.desc}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import { SpaceBackground } from './components/layout/SpaceBackground';
 
 // Pages
 import { Login } from './pages/Login';
+import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import { Vehicles } from './pages/Vehicles';
 import { Drivers } from './pages/Drivers';
@@ -57,6 +58,7 @@ export const App: React.FC = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
             <Route path="/" element={
               <ProtectedRoute>

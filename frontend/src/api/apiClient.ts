@@ -28,7 +28,7 @@ const checkRole = (allowedRoles: Role[]) => {
 export const apiClient = {
   auth: {
     login: async (email: string, password_hash: string, role: string) => {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password: password_hash, role })
@@ -43,7 +43,7 @@ export const apiClient = {
     },
     
     register: async (name: string, email: string, password_hash: string, confirm_password: string, role: string) => {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password: password_hash, confirmPassword: confirm_password, role })
@@ -56,7 +56,7 @@ export const apiClient = {
     },
 
     verifyRegistration: async (email: string, otp: string) => {
-      const response = await fetch('http://localhost:5000/api/auth/verify-registration', {
+      const response = await fetch('/api/auth/verify-registration', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp })
@@ -88,7 +88,7 @@ export const apiClient = {
   vehicles: {
     list: async (filters?: { status?: string; type?: string; region?: string }) => {
       try {
-        const response = await fetch('http://localhost:5000/api/vehicles');
+        const response = await fetch('/api/vehicles');
         let list = await response.json();
         
         // Map _id to id for the frontend
@@ -124,7 +124,7 @@ export const apiClient = {
 
     create: async (vehicleData: Omit<Vehicle, 'id' | 'created_at'>) => {
       try {
-        const response = await fetch('http://localhost:5000/api/vehicles', {
+        const response = await fetch('/api/vehicles', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(vehicleData)
@@ -140,7 +140,7 @@ export const apiClient = {
 
     update: async (id: string, vehicleData: Partial<Vehicle>) => {
       try {
-        const response = await fetch(`http://localhost:5000/api/vehicles/${id}`, {
+        const response = await fetch(`/api/vehicles/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(vehicleData)
@@ -156,7 +156,7 @@ export const apiClient = {
 
     delete: async (id: string) => {
       try {
-        const response = await fetch(`http://localhost:5000/api/vehicles/${id}`, { method: 'DELETE' });
+        const response = await fetch(`/api/vehicles/${id}`, { method: 'DELETE' });
         if (!response.ok) throw new Error('Failed to delete vehicle');
         return { data: { success: true } };
       } catch (err: any) {
@@ -168,7 +168,7 @@ export const apiClient = {
   drivers: {
     list: async (filters?: { status?: string }) => {
       try {
-        const response = await fetch('http://localhost:5000/api/drivers');
+        const response = await fetch('/api/drivers');
         let list = await response.json();
         list = list.map((d: any) => ({ ...d, id: d._id }));
 
@@ -196,7 +196,7 @@ export const apiClient = {
 
     create: async (driverData: Omit<Driver, 'id' | 'created_at'>) => {
       try {
-        const response = await fetch('http://localhost:5000/api/drivers', {
+        const response = await fetch('/api/drivers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(driverData)
@@ -212,7 +212,7 @@ export const apiClient = {
 
     update: async (id: string, driverData: Partial<Driver>) => {
       try {
-        const response = await fetch(`http://localhost:5000/api/drivers/${id}`, {
+        const response = await fetch(`/api/drivers/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(driverData)
@@ -228,7 +228,7 @@ export const apiClient = {
 
     delete: async (id: string) => {
       try {
-        const response = await fetch(`http://localhost:5000/api/drivers/${id}`, { method: 'DELETE' });
+        const response = await fetch(`/api/drivers/${id}`, { method: 'DELETE' });
         if (!response.ok) throw new Error('Failed to delete driver');
         return { data: { success: true } };
       } catch (err: any) {
@@ -240,7 +240,7 @@ export const apiClient = {
   trips: {
     list: async (filters?: { status?: string }) => {
       try {
-        const response = await fetch('http://localhost:5000/api/trips');
+        const response = await fetch('/api/trips');
         let list = await response.json();
         list = list.map((t: any) => ({ ...t, id: t._id }));
         
@@ -254,7 +254,7 @@ export const apiClient = {
           // Attempting to match driver. Normally we'd do this via real Driver ID linked to user.
           // For now, if driver name matches user name.
           try {
-             const drRes = await fetch('http://localhost:5000/api/drivers');
+             const drRes = await fetch('/api/drivers');
              const drivers = await drRes.json();
              const myDriver = drivers.find((d: any) => d.name === user.name);
              if (myDriver) {
@@ -271,7 +271,7 @@ export const apiClient = {
     create: async (tripData: Omit<Trip, 'id' | 'status' | 'created_at'>) => {
       checkRole(['FLEET_MANAGER', 'DRIVER']);
       try {
-        const response = await fetch('http://localhost:5000/api/trips', {
+        const response = await fetch('/api/trips', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(tripData)
@@ -288,7 +288,7 @@ export const apiClient = {
     dispatch: async (id: string) => {
       checkRole(['DRIVER']);
       try {
-        const response = await fetch(`http://localhost:5000/api/trips/${id}`, {
+        const response = await fetch(`/api/trips/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'DISPATCHED' })
@@ -305,7 +305,7 @@ export const apiClient = {
     complete: async (id: string, body: { finalOdometer: number; fuelConsumed: number }) => {
       checkRole(['DRIVER']);
       try {
-        const response = await fetch(`http://localhost:5000/api/trips/${id}`, {
+        const response = await fetch(`/api/trips/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -326,7 +326,7 @@ export const apiClient = {
     cancel: async (id: string) => {
       checkRole(['DRIVER']);
       try {
-        const response = await fetch(`http://localhost:5000/api/trips/${id}`, {
+        const response = await fetch(`/api/trips/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'CANCELLED' })

@@ -1,7 +1,7 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiClient } from '../api/apiClient';
-import type { User, Role } from '../api/mockDb';
+import type { User } from '../api/mockDb';
 
 interface AuthContextType {
   user: User | null;

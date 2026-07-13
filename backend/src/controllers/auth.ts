@@ -65,7 +65,19 @@ export const register = async (req: Request, res: Response) => {
       text: `Your verification code is: ${otp}\nThis code will expire in 10 minutes.`,
     };
 
-    await transporter.sendMail(mailOptions);
+    console.log(`\n==================================================`);
+    console.log(`[VERIFICATION OTP] for ${email}: ${otp}`);
+    console.log(`==================================================\n`);
+
+    try {
+      if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        await transporter.sendMail(mailOptions);
+      } else {
+        console.warn('SMTP credentials not configured. Skipping email send.');
+      }
+    } catch (mailError) {
+      console.error('Failed to send verification email:', mailError);
+    }
 
     res.status(200).json({ message: 'Verification OTP sent to email' });
   } catch (error) {
